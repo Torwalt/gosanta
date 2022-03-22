@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+
+  gobreach-db:
+    image: postgres:13-alpine
+    container_name: "gobreach-db"
+    volumes:
+      - gobreach-data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_SECRET}
+      - POSTGRES_SECRET=${POSTGRES_SECRET}
+      - POSTGRES_DB=${POSTGRES_NAME}
+      - POSTGRES_NAME=${POSTGRES_NAME}
+    ports:
+      - "5432:5432"
+    networks:
+      - gobreach-net
+
+  gobreach-server:
+    container_name: "gobreach-server"
+    depends_on:
+      - gobreach-db
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+    build:
+      context: .
+      args:
+        - HTTP_PORT=${HTTP_PORT}
+        - BINARY_NAME=gobreach_server
+
+networks:
+  gobreach-net:
+    driver: bridge
+
+volumes:
+  gobreach-data:
