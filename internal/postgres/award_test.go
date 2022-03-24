@@ -53,7 +53,7 @@ func TestAwardGet(t *testing.T) {
 	assert.NotNil(t, a)
 
 	assert.Equal(t, int64(1), a.Id)
-	assert.Equal(t, awards.OpenAward, a.Reason)
+	assert.Equal(t, awards.OpenAward, a.Type)
 	assert.Equal(t, awards.UserId(1), a.AssignedTo)
 }
 

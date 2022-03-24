@@ -13,7 +13,7 @@ func TestNew(t *testing.T) {
 		Name          string
 		User          awards.User
 		emailRef      string
-		reason        awards.AwardType
+		action        awards.PhishingAction
 		expectedErr   error
 		expectedAward *awards.PhishingAward
 	}{
@@ -21,12 +21,12 @@ func TestNew(t *testing.T) {
 			Name:        "first award",
 			User:        awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
 			emailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
-			reason:      awards.OpenAward,
+			action:      awards.Opened,
 			expectedErr: nil,
 			expectedAward: &awards.PhishingAward{
 				Id:         0,
 				AssignedTo: awards.UserId(1),
-				Reason:     awards.OpenAward,
+				Type:       awards.OpenAward,
 				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 			},
 		},
@@ -39,13 +39,13 @@ func TestNew(t *testing.T) {
 					{
 						Id:         0,
 						AssignedTo: awards.UserId(1),
-						Reason:     awards.OpenAward,
+						Type:       awards.OpenAward,
 						EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 					},
 				},
 			},
 			emailRef: "f20416ef-15d5-4159-9bef-de150edfa970",
-			reason:   awards.OpenAward,
+			action:   awards.Opened,
 			expectedErr: &awards.Error{
 				Code: awards.DuplicateError,
 				Err: fmt.Errorf(
@@ -65,18 +65,18 @@ func TestNew(t *testing.T) {
 					{
 						Id:         0,
 						AssignedTo: awards.UserId(1),
-						Reason:     awards.OpenAward,
+						Type:       awards.OpenAward,
 						EmailRef:   "36b9c31a-d090-4e54-8660-6c44e2947aa0",
 					},
 				},
 			},
 			emailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
-			reason:      awards.OpenAward,
+			action:      awards.Opened,
 			expectedErr: nil,
 			expectedAward: &awards.PhishingAward{
 				Id:         0,
 				AssignedTo: awards.UserId(1),
-				Reason:     awards.OpenAward,
+				Type:       awards.OpenAward,
 				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 			},
 		},
@@ -84,13 +84,13 @@ func TestNew(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			a, err := awards.New(test.User, test.emailRef, test.reason)
+			a, err := awards.New(test.User, test.emailRef, test.action)
 
 			assert.Equal(t, test.expectedErr, err)
 			if test.expectedAward != nil {
 				assert.Equal(t, test.expectedAward.AssignedTo, a.AssignedTo)
 				assert.Equal(t, test.expectedAward.EmailRef, a.EmailRef)
-				assert.Equal(t, test.expectedAward.Reason, a.Reason)
+				assert.Equal(t, test.expectedAward.Type, a.Type)
 			}
 		})
 	}

@@ -80,7 +80,7 @@ func toAward(dbAward DBAward) awards.PhishingAward {
 		Id:         dbAward.ID,
 		AssignedTo: awards.UserId(dbAward.UserID),
 		EarnedOn:   dbAward.EarnedOn,
-		Reason:     awards.AwardType(dbAward.Reason),
+		Type:     awards.AwardType(dbAward.Reason),
 		EmailRef:   dbAward.EmailRef,
 	}
 }

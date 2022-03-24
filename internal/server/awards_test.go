@@ -34,7 +34,7 @@ func TestGetUserAwards(t *testing.T) {
 			Id:         1,
 			AssignedTo: userId,
 			EarnedOn:   time.Now(),
-			Reason:     awards.OpenAward,
+			Type:     awards.OpenAward,
 			EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 		},
 	}
@@ -48,7 +48,7 @@ func TestGetUserAwards(t *testing.T) {
 		Id:        awardS[0].Id,
 		UserId:    int(awardS[0].AssignedTo),
 		CreatedOn: awardS[0].EarnedOn,
-		Type:      awardS[0].Reason.String(),
+		Type:      awardS[0].Type.String(),
 	}
 	err = json.NewDecoder(rr.Body).Decode(&gotS)
 	if err != nil {
@@ -114,7 +114,7 @@ func TestGetUserAwardsErrors(t *testing.T) {
 					Id:         1,
 					AssignedTo: test.ActualUserId,
 					EarnedOn:   time.Now(),
-					Reason:     awards.OpenAward,
+					Type:     awards.OpenAward,
 					EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 				},
 			}

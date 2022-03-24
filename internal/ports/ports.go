@@ -7,7 +7,7 @@ import "gosanta/internal"
 type CreatePhishingAward struct {
 	Id       awards.UserId
 	EmailRef string
-	Reason   awards.AwardType
+	Action   awards.PhishingAction
 }
 
 type AwardReadRepository interface {

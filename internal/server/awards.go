@@ -51,7 +51,7 @@ func (h *awardsHandler) getUserAwards(w http.ResponseWriter, r *http.Request) {
 	for _, a := range awardS {
 		uar := UserAwardResponse{
 			Id: a.Id, UserId: int(a.AssignedTo), CreatedOn: a.EarnedOn,
-			Type: a.Reason.String()}
+			Type: a.Type.String()}
 		resp = append(resp, uar)
 	}
 	if err := json.NewEncoder(w).Encode(resp); err != nil {

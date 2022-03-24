@@ -20,7 +20,7 @@ func (s *AwardService) AssignPhishingAward(cpa *ports.CreatePhishingAward) (*awa
 	if err != nil {
 		return nil, err
 	}
-	a, err := awards.New(*u, cpa.EmailRef, cpa.Reason)
+	a, err := awards.New(*u, cpa.EmailRef, cpa.Action)
 	if err != nil {
 		return nil, err
 	}
