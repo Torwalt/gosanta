@@ -1,7 +1,9 @@
 package postgres
 
 import (
+	"context"
 	"database/sql"
+	"fmt"
 	awards "gosanta/internal"
 
 	"github.com/uptrace/bun"
@@ -11,8 +13,9 @@ import (
 type DBUser struct {
 	bun.BaseModel `bun:"table:users"`
 
-	ID        int64 `bun:",pk,autoincrement"`
-	CompanyId int64
+	ID        int64      `bun:"id,pk,autoincrement"`
+	CompanyId int64      `bun:"company_id,notnull"`
+	Awards    []*DBAward `bun:"rel:has-many,join:id=user_id"`
 }
 
 type userRepository struct {
@@ -26,10 +29,16 @@ func NewUserRepository(sqlDb *sql.DB) *userRepository {
 
 func (ar *userRepository) Get(id awards.UserId) (*awards.User, error) {
 	dbu := new(DBUser)
-	err := ar.db.NewSelect().Model(dbu).Where("id = ?", id).Scan(nil)
-	// TODO
+	ctx := context.Background()
+	err := ar.db.NewSelect().Model(dbu).Relation("Awards").Where("id = ?", id).Scan(ctx)
 	if err != nil {
-		return nil, nil
+		if err == sql.ErrNoRows {
+			return nil, &awards.Error{
+				Code: awards.DoesNotExistError,
+				Err:  fmt.Errorf("no user with id: %v", id),
+			}
+		}
+		return nil, err
 	}
 
 	pa := toUser(*dbu)
@@ -37,8 +46,14 @@ func (ar *userRepository) Get(id awards.UserId) (*awards.User, error) {
 }
 
 func toUser(dbUser DBUser) awards.User {
+	var awardS []awards.PhishingAward
+	for _, dba := range dbUser.Awards {
+		awardS = append(awardS, toAward(*dba))
+	}
+
 	return awards.User{
 		Id:        awards.UserId(dbUser.ID),
 		CompanyId: awards.CompanyId(dbUser.CompanyId),
+		Awards: awardS,
 	}
 }

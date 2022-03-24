@@ -2,11 +2,11 @@ version: '3.4'
 
 services:
 
-  gobreach-db:
+  gosanta-db:
     image: postgres:13-alpine
-    container_name: "gobreach-db"
+    container_name: "gosanta-db"
     volumes:
-      - gobreach-data:/var/lib/postgresql/data/
+      - gosanta-data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_SECRET}
@@ -16,23 +16,23 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - gobreach-net
+      - gosanta-net
 
-  gobreach-server:
-    container_name: "gobreach-server"
+  gosanta-server:
+    container_name: "gosanta-server"
     depends_on:
-      - gobreach-db
+      - gosanta-db
     ports:
       - ${HTTP_PORT}:${HTTP_PORT}
     build:
       context: .
       args:
         - HTTP_PORT=${HTTP_PORT}
-        - BINARY_NAME=gobreach_server
+        - BINARY_NAME=gosanta_server
 
 networks:
-  gobreach-net:
+  gosanta-net:
     driver: bridge
 
 volumes:
-  gobreach-data:
+  gosanta-data:

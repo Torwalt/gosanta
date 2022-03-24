@@ -15,7 +15,7 @@ COPY ./cmd ./cmd
 COPY ./internal ./internal
 
 RUN go mod download
-RUN go build -o ./bin/$BINARY_NAME ./cmd/server/main.go
+RUN go build -o ./bin/$BINARY_NAME ./cmd/awardservice/main.go
 
 EXPOSE $HTTP_PORT
 

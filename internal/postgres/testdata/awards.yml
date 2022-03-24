@@ -1,0 +1,24 @@
+- model: DBAward
+  rows:
+    - _id: open
+      user_id: 1
+      earned_on: '{{ now }}'
+      reason: 0
+      email_ref: "f20416ef-15d5-4159-9bef-de150edfa970"
+    - _id: other
+      user_id: 1
+      earned_on: '{{ now }}'
+      reason: 1
+      email_ref: "f20416ef-15d5-4159-9bef-de150edfa970"
+    - _id: different
+      user_id: 2
+      earned_on: '{{ now }}'
+      reason: 1
+      email_ref: "f20416ef-15d5-4159-9bef-de150edfa970"
+
+- model: DBUser
+  rows:
+    - _id: one
+      company_id: 1
+    - _id: two
+      company_id: 1

@@ -4,6 +4,7 @@ type ErrorType int
 
 const (
 	DuplicateError ErrorType = iota
+	DoesNotExistError
 )
 
 type Error struct {

@@ -1,1 +1,4 @@
 .git
+.env
+cover.out
+gobreach_server

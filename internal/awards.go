@@ -12,8 +12,11 @@ type CompanyId int64
 type AwardType int
 
 const (
+	// For opening a phishing mail
 	OpenAward AwardType = iota
+	// For reporting a phishing mail
 	ReportAward
+	// For ignoring a phishing mail
 	IgnoreAward
 )
 
