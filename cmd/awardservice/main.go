@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gosanta/internal/postgres"
 	"gosanta/internal/ranking"
 	"gosanta/internal/server"
@@ -11,6 +12,7 @@ import (
 func main() {
 	err := run()
 	if err != nil {
+		fmt.Printf("An error occurred while starting the service: %v", err)
 		os.Exit(1)
 	}
 }
@@ -35,7 +37,10 @@ func run() error {
 
 	srv := server.New(&r)
 
-	http.ListenAndServe(":"+config.http_port, &srv)
+	err := http.ListenAndServe(":"+config.http_port, &srv)
+	if err != nil {
+		return fmt.Errorf("could not start server: %v", err)
+	}
 
 	return nil
 }

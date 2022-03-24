@@ -15,8 +15,7 @@ type UserAwardResponse struct {
 	Id        int64     `json:"id"`
 	UserId    int       `json:"user_id"`
 	CreatedOn time.Time `json:"created_on"`
-	Reason    string    `json:"reason"`
-	EmailRef  string    `json:"email_ref"`
+	Type      string    `json:"award_type"`
 }
 
 type awardsHandler struct {
@@ -26,7 +25,11 @@ type awardsHandler struct {
 func (h *awardsHandler) router() chi.Router {
 	r := chi.NewRouter()
 
-	r.Get("/user", h.getUserAwards)
+	r.Route("/user", func(r chi.Router) {
+		r.Route("/{userID}", func(r chi.Router) {
+			r.Get("/", h.getUserAwards)
+		})
+	})
 
 	return r
 }
@@ -36,24 +39,22 @@ func (h *awardsHandler) getUserAwards(w http.ResponseWriter, r *http.Request) {
 	uId, err := strconv.Atoi(uIds)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		encodeError(err, w)
+		writeError(err, w)
 		return
 	}
-	awards, err := h.s.GetUserAwards(awards.UserId(uId))
+	awardS, err := h.s.GetUserAwards(awards.UserId(uId))
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		encodeError(err, w)
 		return
 	}
 	resp := []UserAwardResponse{}
-	for _, a := range awards {
+	for _, a := range awardS {
 		uar := UserAwardResponse{
 			Id: a.Id, UserId: int(a.AssignedTo), CreatedOn: a.EarnedOn,
-			Reason: a.Reason.String(), EmailRef: a.EmailRef}
+			Type: a.Reason.String()}
 		resp = append(resp, uar)
 	}
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		encodeError(err, w)
 		return
 	}

@@ -1,5 +1,7 @@
 package ports
 
+//go:generate mockgen -destination=../mocks/mocks.go -package=mocks -source=./ports.go
+
 import "gosanta/internal"
 
 type CreatePhishingAward struct {

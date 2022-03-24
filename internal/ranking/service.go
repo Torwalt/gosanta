@@ -19,7 +19,11 @@ func (s *RankingService) Get(u string) (awards.PhishingAward, error) {
 }
 
 func (s *RankingService) GetUserAwards(uId awards.UserId) ([]awards.PhishingAward, error) {
-	return []awards.PhishingAward{}, nil
+	awardS, err := s.awardRepo.GetByUserId(uId)
+	if err != nil {
+		return awardS, err
+	}
+	return awardS, nil
 }
 
 func (s *RankingService) GetCompanyAwards(cId awards.CompanyId) ([]awards.PhishingAward, error) {

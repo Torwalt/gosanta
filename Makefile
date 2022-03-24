@@ -25,7 +25,7 @@ down-docker-compose:
 	sudo docker-compose down
 
 run:
-	go build -o ${BINARY_NAME} ./cmd/server/main.go
+	go build -o ${BINARY_NAME} ./cmd/awardservice/main.go
 	./${BINARY_NAME}
 
 clean:

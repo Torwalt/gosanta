@@ -42,7 +42,7 @@ func TestAwardGet(t *testing.T) {
 	resetDb(t, db, ctx)
 	ar := postgres.NewAwardRepository(db.DB)
 
-	fixture := dbfixture.New(db)
+	fixture := dbfixture.New(db, dbfixture.WithRecreateTables())
 	err := fixture.Load(ctx, os.DirFS("testdata"), "awards.yml")
 	if err != nil {
 		t.Errorf("could not load fixture: %v", err)
