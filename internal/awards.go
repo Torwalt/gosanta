@@ -5,46 +5,6 @@ import (
 	"time"
 )
 
-type UserId int64
-type CompanyId int64
-
-type PhishingAction int
-
-const (
-	Opened = iota
-	Clicked
-	Reported
-	Ignored
-)
-
-func (p PhishingAction) ToAwardType() AwardType {
-	switch p {
-	case Opened:
-		return OpenAward
-	case Reported:
-		return ReportAward
-	case Ignored:
-		return IgnoreAward
-	default:
-		return -1
-	}
-}
-
-func (a PhishingAction) String() string {
-	switch a {
-	case Opened:
-		return "opened"
-	case Reported:
-		return "reported"
-	case Ignored:
-		return "ignored"
-	case Clicked:
-		return "clicked"
-	default:
-		return ""
-	}
-}
-
 // The reason an award was given.
 type AwardType int
 
@@ -79,30 +39,7 @@ type PhishingAward struct {
 	EmailRef   string
 }
 
-// A user that can receive an award.
-type User struct {
-	Id        UserId
-	CompanyId CompanyId
-	Awards    []PhishingAward
-}
-
-// Return award received for the interaction with a phishing mail.
-func (u *User) FindRelatedAward(emailRef string) *PhishingAward {
-	for _, a := range u.Awards {
-		if a.EmailRef == emailRef {
-			return &a
-		}
-	}
-	return nil
-}
-
-// A company to which users belong.
-type Company struct {
-	id    CompanyId
-	users []User
-}
-
-// Prepare a new award for a user. An award cannot be gained twice.
+// Prepare a new award for a user
 func New(u User, emailRef string, action PhishingAction) (*PhishingAward, error) {
 	typ := action.ToAwardType()
 	if typ == -1 {
@@ -111,9 +48,10 @@ func New(u User, emailRef string, action PhishingAction) (*PhishingAward, error)
 	}
 
 	award := u.FindRelatedAward(emailRef)
-	if isDuplicate(award, typ) {
-		return nil, &Error{Code: DuplicateError, Err: fmt.Errorf(
-			"user %v has already earned award from email %v", u.Id, emailRef)}
+	if award != nil {
+		if err := canAssignAward(*award, typ); err != nil {
+			return nil, err
+		}
 	}
 
 	return &PhishingAward{
@@ -124,12 +62,39 @@ func New(u User, emailRef string, action PhishingAction) (*PhishingAward, error)
 	}, nil
 }
 
-func isDuplicate(award *PhishingAward, newAward AwardType) bool {
-	if award == nil {
-		return false
+func canAssignAward(existingAward PhishingAward, newAward AwardType) error {
+	if isDuplicate(existingAward, newAward) {
+		return &Error{Code: DuplicateError, Err: fmt.Errorf(
+			"user %v has already earned award from email %v", existingAward.AssignedTo, existingAward.EmailRef)}
 	}
+	if wasIgnored(existingAward) {
+		return &Error{Code: NoAward, Err: fmt.Errorf(
+			"user %v has ignored email %v for too long", existingAward.AssignedTo, existingAward.EmailRef)}
+	}
+	// if wasClicked(existingAward) {
+	// 	return &Error{Code: NoAward, Err: fmt.Errorf(
+	// 		"user %v has already clicked the phishing link in email %v", existingAward.AssignedTo, existingAward.EmailRef)}
+	// }
+	return nil
+}
+
+func isDuplicate(award PhishingAward, newAward AwardType) bool {
 	if award.Type == newAward {
 		return true
 	}
 	return false
 }
+
+func wasIgnored(award PhishingAward) bool {
+	if award.Type == IgnoreAward {
+		return true
+	}
+	return false
+}
+
+// func wasClicked(award PhishingAward) bool {
+// 	if award.Type == Clicked {
+// 		return true
+// 	}
+// 	return false
+// }

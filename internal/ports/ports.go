@@ -1,8 +1,11 @@
 package ports
 
-//go:generate mockgen -destination=../mocks/mocks.go -package=mocks -source=./ports.go
+//go:generate mockgen -destination=../mocks/ports.go -package=mocks -source=./ports.go
 
-import "gosanta/internal"
+import (
+	"gosanta/internal"
+	"gosanta/pkg"
+)
 
 type CreatePhishingAward struct {
 	Id       awards.UserId
@@ -26,11 +29,25 @@ type UserReadRepository interface {
 }
 
 type AwardAssigningService interface {
-	AssignPhishingAward(cpa *CreatePhishingAward)
+	HandlePhishingEvent(cpa *CreatePhishingAward)
 }
 
 type AwardReadingService interface {
 	Get(id string) (awards.PhishingAward, error)
 	GetUserAwards(uId awards.UserId) ([]awards.PhishingAward, error)
 	GetCompanyAwards(cId awards.CompanyId) ([]awards.PhishingAward, error)
+}
+
+type EventReadRepository interface {
+	GetUnprocessed() ([]awards.UserPhishingEvent, error)
+}
+
+type EventRepository interface {
+	EventReadRepository
+	Write(upe awards.UserPhishingEvent) error
+}
+
+type EventQueue interface {
+	GetNextMessages() ([]events.PhishingEvent, error)
+	DeleteMessage(eventID string) error
 }

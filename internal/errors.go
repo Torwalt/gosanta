@@ -6,6 +6,7 @@ const (
 	DuplicateError ErrorType = iota
 	DoesNotExistError
 	NoAward
+	NotPhishingAction
 )
 
 type Error struct {

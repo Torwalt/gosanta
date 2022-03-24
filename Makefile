@@ -2,7 +2,7 @@ BINARY_NAME=awardservice
 
 
 build:
-	go build -o ${BINARY_NAME} ./cmd/awardservice/main.go
+	go build -o ./bin/${BINARY_NAME} ./cmd/rankingservice/main.go
 
 build-docker:
 	sudo docker build \
@@ -25,12 +25,12 @@ down-docker-compose:
 	sudo docker-compose down
 
 run:
-	go build -o ${BINARY_NAME} ./cmd/awardservice/main.go
-	./${BINARY_NAME}
+	make build
+	./bin/${BINARY_NAME}
 
 clean:
 	go clean
-	rm ${BINARY_NAME}
+	rm ./bin/${BINARY_NAME}
 
 test:
 	go test ./... -v -short

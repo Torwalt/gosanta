@@ -1,0 +1,13 @@
+- model: DBPhishingEvent
+  rows:
+    - _id: open
+      user_id: 1
+      created_at: '{{ now }}'
+      action: 0
+      email_ref: "f20416ef-15d5-4159-9bef-de150edfa970"
+      processed_at: null
+
+- model: DBUser
+  rows:
+    - _id: one
+      company_id: 1

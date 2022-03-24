@@ -15,6 +15,7 @@ func NewAwardService(awardRepo ports.AwardRepository, userRepo ports.UserReadRep
 }
 
 // Assign a PhishingAward to a User.
+// TODO: For award upgrade or downgrade, the award has to be removed here.
 func (s *AwardService) AssignPhishingAward(cpa *ports.CreatePhishingAward) (*awards.PhishingAward, error) {
 	u, err := s.userRepo.Get(cpa.Id)
 	if err != nil {

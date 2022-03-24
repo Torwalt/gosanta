@@ -13,9 +13,10 @@ COPY go.mod go.sum .env ./
 COPY ./bin ./bin
 COPY ./cmd ./cmd
 COPY ./internal ./internal
+COPY ./pkg ./pkg
 
 RUN go mod download
-RUN go build -o ./bin/$BINARY_NAME ./cmd/awardservice/main.go
+RUN go build -o ./bin/$BINARY_NAME ./cmd/rankingservice/main.go
 
 EXPOSE $HTTP_PORT
 
