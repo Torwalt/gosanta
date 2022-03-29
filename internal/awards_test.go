@@ -4,94 +4,221 @@ import (
 	"fmt"
 	awards "gosanta/internal"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestIsProtected(t *testing.T) {
+	tests := []struct {
+		Name           string
+		EarnedOn       time.Time
+		ExpIsProtected bool
+	}{
+		{
+			Name:           "is not protected",
+			EarnedOn:       time.Now().AddDate(0, 0, -4),
+			ExpIsProtected: false,
+		},
+		{
+			Name:           "is protected",
+			EarnedOn:       time.Now().AddDate(0, 0, -5),
+			ExpIsProtected: true,
+		},
+	}
+
+	for _, test := range tests {
+		pa := &awards.PhishingAward{
+			Id:         int64(1),
+			AssignedTo: awards.UserId(1),
+			EarnedOn:   test.EarnedOn,
+			Type:       awards.OpenAward,
+			EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
+		}
+		isProtected := pa.IsProtected()
+
+		assert.Equal(t, test.ExpIsProtected, isProtected)
+	}
+}
 
 func TestNew(t *testing.T) {
 	tests := []struct {
 		Name          string
 		User          awards.User
-		emailRef      string
-		action        awards.PhishingAction
-		expectedErr   error
-		expectedAward *awards.PhishingAward
+		Event         awards.UserPhishingEvent
+		WasClicked    bool
+		ExistingAward *awards.PhishingAward
+		ExpectedError error
+		ExpectedAward *awards.PhishingAward
 	}{
 		{
-			Name:        "first award",
-			User:        awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
-			emailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
-			action:      awards.Opened,
-			expectedErr: nil,
-			expectedAward: &awards.PhishingAward{
-				Id:         0,
+			Name: "new award created",
+			User: awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
+			Event: awards.UserPhishingEvent{
+				ID:          int64(1),
+				UserID:      awards.UserId(1),
+				Action:      awards.Opened,
+				CreatedAt:   time.Now(),
+				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
+				ProcessedAt: nil,
+			},
+			WasClicked:    false,
+			ExistingAward: nil,
+			ExpectedError: nil,
+			ExpectedAward: &awards.PhishingAward{
+				Id:         int64(1),
 				AssignedTo: awards.UserId(1),
+				EarnedOn:   time.Now(),
 				Type:       awards.OpenAward,
 				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 			},
 		},
 		{
-			Name: "duplicate",
-			User: awards.User{
-				Id:        awards.UserId(1),
-				CompanyId: awards.CompanyId(1),
-				Awards: []awards.PhishingAward{
-					{
-						Id:         0,
-						AssignedTo: awards.UserId(1),
-						Type:       awards.OpenAward,
-						EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
-					},
-				},
+			Name: "existing award updated",
+			User: awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
+			Event: awards.UserPhishingEvent{
+				ID:          int64(1),
+				UserID:      awards.UserId(1),
+				Action:      awards.Reported,
+				CreatedAt:   time.Now(),
+				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
+				ProcessedAt: nil,
 			},
-			emailRef: "f20416ef-15d5-4159-9bef-de150edfa970",
-			action:   awards.Opened,
-			expectedErr: &awards.Error{
-				Code: awards.DuplicateError,
-				Err: fmt.Errorf(
-					"user %v has already earned award from email %v",
-					awards.UserId(1),
-					"f20416ef-15d5-4159-9bef-de150edfa970",
-				),
-			},
-			expectedAward: nil,
-		},
-		{
-			Name: "new award",
-			User: awards.User{
-				Id:        awards.UserId(1),
-				CompanyId: awards.CompanyId(1),
-				Awards: []awards.PhishingAward{
-					{
-						Id:         0,
-						AssignedTo: awards.UserId(1),
-						Type:       awards.OpenAward,
-						EmailRef:   "36b9c31a-d090-4e54-8660-6c44e2947aa0",
-					},
-				},
-			},
-			emailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
-			action:      awards.Opened,
-			expectedErr: nil,
-			expectedAward: &awards.PhishingAward{
-				Id:         0,
+			WasClicked: false,
+			ExistingAward: &awards.PhishingAward{
+				Id:         int64(1),
 				AssignedTo: awards.UserId(1),
+				EarnedOn:   time.Now().Add(time.Duration(-10)),
 				Type:       awards.OpenAward,
 				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 			},
+			ExpectedError: nil,
+			ExpectedAward: &awards.PhishingAward{
+				Id:         int64(1),
+				AssignedTo: awards.UserId(1),
+				EarnedOn:   time.Now(),
+				Type:       awards.ReportAward,
+				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
+			},
+		},
+		{
+			Name: "action not eligible for award",
+			User: awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
+			Event: awards.UserPhishingEvent{
+				ID:          int64(1),
+				UserID:      awards.UserId(1),
+				Action:      awards.Clicked,
+				CreatedAt:   time.Now(),
+				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
+				ProcessedAt: nil,
+			},
+			WasClicked:    false,
+			ExistingAward: nil,
+			ExpectedError: &awards.Error{Code: awards.NoAward, Err: fmt.Errorf(
+				"action %v is not eligible for award", awards.Clicked)},
+			ExpectedAward: nil,
+		},
+		{
+			Name: "clicked event exists",
+			User: awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
+			Event: awards.UserPhishingEvent{
+				ID:          int64(1),
+				UserID:      awards.UserId(1),
+				Action:      awards.Opened,
+				CreatedAt:   time.Now(),
+				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
+				ProcessedAt: nil,
+			},
+			WasClicked:    true,
+			ExistingAward: nil,
+			ExpectedError: &awards.Error{Code: awards.NoAward, Err: fmt.Errorf(
+				"action %v is not eligible for award: phishing link was clicked", awards.Opened)},
+			ExpectedAward: nil,
+		},
+		{
+			Name: "already ignored",
+			User: awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
+			Event: awards.UserPhishingEvent{
+				ID:          int64(1),
+				UserID:      awards.UserId(1),
+				Action:      awards.Opened,
+				CreatedAt:   time.Now(),
+				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
+				ProcessedAt: nil,
+			},
+			WasClicked:    false,
+			ExistingAward: &awards.PhishingAward{
+				Id:         int64(1),
+				AssignedTo: awards.UserId(1),
+				EarnedOn:   time.Now().Add(time.Duration(-10)),
+				Type:       awards.IgnoreAward,
+				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
+			},
+			ExpectedError: &awards.Error{Code: awards.NoAward, Err: fmt.Errorf(
+				"action %v is not eligible for award: email was already ignored", awards.Opened)},
+			ExpectedAward: nil,
+		},
+		{
+			Name: "is duplicate",
+			User: awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
+			Event: awards.UserPhishingEvent{
+				ID:          int64(1),
+				UserID:      awards.UserId(1),
+				Action:      awards.Opened,
+				CreatedAt:   time.Now(),
+				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
+				ProcessedAt: nil,
+			},
+			WasClicked:    false,
+			ExistingAward: &awards.PhishingAward{
+				Id:         int64(1),
+				AssignedTo: awards.UserId(1),
+				EarnedOn:   time.Now().Add(time.Duration(-10)),
+				Type:       awards.OpenAward,
+				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
+			},
+			ExpectedError: &awards.Error{Code: awards.NoAward, Err: fmt.Errorf(
+				"action %v is not eligible for award: award already earned", awards.Opened)},
+			ExpectedAward: nil,
+		},
+		{
+			Name: "not upgradeable",
+			User: awards.User{Id: awards.UserId(1), CompanyId: awards.CompanyId(1)},
+			Event: awards.UserPhishingEvent{
+				ID:          int64(1),
+				UserID:      awards.UserId(1),
+				Action:      awards.Opened,
+				CreatedAt:   time.Now(),
+				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
+				ProcessedAt: nil,
+			},
+			WasClicked:    false,
+			ExistingAward: &awards.PhishingAward{
+				Id:         int64(1),
+				AssignedTo: awards.UserId(1),
+				EarnedOn:   time.Now().Add(time.Duration(-10)),
+				Type:       awards.ReportAward,
+				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
+			},
+			ExpectedError: &awards.Error{Code: awards.NoAward, Err: fmt.Errorf(
+				"action %v is not eligible for award: cannot upgrade award", awards.Opened)},
+			ExpectedAward: nil,
 		},
 	}
 
 	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
-			a, err := awards.New(test.User, test.emailRef, test.action)
+		award, err := awards.New(test.User, test.Event, test.WasClicked, test.ExistingAward)
 
-			assert.Equal(t, test.expectedErr, err)
-			if test.expectedAward != nil {
-				assert.Equal(t, test.expectedAward.AssignedTo, a.AssignedTo)
-				assert.Equal(t, test.expectedAward.EmailRef, a.EmailRef)
-				assert.Equal(t, test.expectedAward.Type, a.Type)
-			}
-		})
+		assert.Equal(t, test.ExpectedError, err)
+
+		if test.ExpectedAward == nil {
+			assert.Nil(t, award)
+		}
+
+		if test.ExpectedAward != nil {
+			assert.Equal(t, test.ExpectedAward.AssignedTo, award.AssignedTo)
+			assert.Equal(t, test.ExpectedAward.Type, award.Type)
+			assert.Equal(t, test.ExpectedAward.EmailRef, award.EmailRef)
+		}
 	}
 }

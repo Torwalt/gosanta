@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+// Represents an interaction (or the lack of) by a user with a test pishing email.
+// Opened: Opened the test pishing email.
+// Clicked: Clicked on the phishing link in the test pishing email.
+// Reported: Forwarded the test pishing email to the malware-scanner.
+// Ignored: The test pishing email was not interacted with by the user for a period of time.
 type PhishingAction int
 
 const (

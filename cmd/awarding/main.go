@@ -2,32 +2,22 @@ package main
 
 import (
 	"fmt"
-	"gosanta/internal/awssqs"
-	"gosanta/internal/eventlogging"
+	"gosanta/internal/awarding"
 	"gosanta/internal/postgres"
 	"log"
 	"os"
-
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 func main() {
-	fmt.Print("Starting event sync.")
+	fmt.Print("Starting awarding job.")
 	err := run()
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	fmt.Print("Events loaded without issue.")
 }
 
 func run() error {
-	sess := session.New()
-	s := sqs.New(sess)
-	er := awssqs.New(s, "asd")
-
 	config := loadFromEnv()
-
 	pconf := postgres.Config{
 		Host:   config.postgres_host,
 		Port:   config.postgres_port,
@@ -36,20 +26,20 @@ func run() error {
 		Name:   config.postgres_name,
 	}
 	sqldb := postgres.NewDb(pconf)
-	erRepo := postgres.NewPhishingEventRepository(sqldb)
-	el := eventlogging.New(erRepo, &er)
+	ar := postgres.NewAwardRepository(sqldb)
+	ur := postgres.NewUserRepository(sqldb)
+	er := postgres.NewPhishingEventRepository(sqldb)
 
-	err := el.LogNewEvents()
+	awardSrv := awarding.NewAwardService(ar, ur, er)
+
+	err := awardSrv.ProcessPhishingEvents()
 	if err != nil {
-		return fmt.Errorf("error when logging new events: %v", err)
+		return fmt.Errorf("an error occurred when assigning phishing awards: %v", err)
 	}
-
 	return nil
 }
 
 type config struct {
-	queueURL string
-
 	postgres_host   string
 	postgres_port   string
 	postgres_user   string
@@ -59,7 +49,6 @@ type config struct {
 
 func loadFromEnv() *config {
 	return &config{
-		queueURL:        os.Getenv("queueURL"),
 		postgres_host:   os.Getenv("POSTGRES_HOST"),
 		postgres_port:   os.Getenv("POSTGRES_PORT"),
 		postgres_user:   os.Getenv("POSTGRES_USER"),

@@ -35,15 +35,59 @@ func NewAwardRepository(sqlDb *sql.DB) *AwardRepository {
 }
 
 func (ar *AwardRepository) Get(id int64) (*awards.PhishingAward, error) {
-	dba := new(DBAward)
 	ctx := context.Background()
-	err := ar.db.NewSelect().Model(dba).Where("id = ?", id).Scan(ctx)
+	query := ar.db.NewSelect().Where("id = ?", id)
+
+	award, err := ar.getOne(ctx, query)
+	if err != nil {
+		return award, awards.ExtendError(
+			err,
+			fmt.Sprintf("no award with id: %v", id),
+		)
+	}
+
+	return award, nil
+}
+
+func (ar *AwardRepository) GetUserAwards(id awards.UserId) ([]awards.PhishingAward, error) {
+	ctx := context.Background()
+	query := ar.db.NewSelect().Where("user_id = ?", id)
+
+	awardS, err := ar.getList(ctx, query)
+	if err != nil {
+		return awardS, awards.ExtendError(err, fmt.Sprintf("could not retrieve for userId: %v", id))
+	}
+
+	return awardS, nil
+}
+
+func (ar *AwardRepository) GetByEmailRef(
+	id awards.UserId,
+	ref string,
+) (*awards.PhishingAward, error) {
+	ctx := context.Background()
+	query := ar.db.NewSelect().Where("email_ref = ? AND user_id = ?", ref, id)
+
+	award, err := ar.getOne(ctx, query)
+	if err != nil {
+		return award, awards.ExtendError(
+			err,
+			fmt.Sprintf("could not retrieve for userId: %v and emailRef: %v", id, ref),
+		)
+	}
+
+	return award, nil
+}
+
+func (ar *AwardRepository) getOne(
+	ctx context.Context,
+	sQuery *bun.SelectQuery,
+) (*awards.PhishingAward, error) {
+	dba := new(DBAward)
+	err := sQuery.Model(dba).Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, &awards.Error{
-				Code: awards.DoesNotExistError,
-				Err:  fmt.Errorf("no award with id: %v", id),
-			}
+			return nil, nil
 		}
 		return nil, err
 	}
@@ -52,19 +96,21 @@ func (ar *AwardRepository) Get(id int64) (*awards.PhishingAward, error) {
 	return &pa, nil
 }
 
-func (ar *AwardRepository) GetByUserId(id awards.UserId) ([]awards.PhishingAward, error) {
-	var dbAwards []DBAward
+func (ar *AwardRepository) getList(
+	ctx context.Context,
+	sQuery *bun.SelectQuery,
+) ([]awards.PhishingAward, error) {
 	var awardS []awards.PhishingAward
+	var dbAwards []DBAward
 
-	ctx := context.Background()
-	err := ar.db.NewSelect().Model(&dbAwards).Relation("User").Where("user_id = ?", id).Scan(ctx)
+	err := sQuery.Model(&dbAwards).Scan(ctx)
 	if err != nil {
 		return awardS, err
 	}
 	if len(dbAwards) == 0 {
 		return awardS, &awards.Error{
 			Code: awards.DoesNotExistError,
-			Err:  fmt.Errorf("no awards for user with id: %v", id),
+			Err:  fmt.Errorf("no awards"),
 		}
 	}
 
@@ -75,12 +121,59 @@ func (ar *AwardRepository) GetByUserId(id awards.UserId) ([]awards.PhishingAward
 	return awardS, nil
 }
 
+func (ar *AwardRepository) Add(award *awards.PhishingAward) error {
+	dbpe := &DBAward{
+		UserID:   int64(award.AssignedTo),
+		EarnedOn: award.EarnedOn,
+		Reason:   int(award.Type),
+		EmailRef: award.EmailRef,
+	}
+	ctx := context.Background()
+
+	_, err := ar.db.NewInsert().Model(dbpe).Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("could not insert PhishingAward for user: %v: %v", award.AssignedTo, err)
+	}
+	return nil
+}
+
+func (ar *AwardRepository) Delete(id int64) error {
+	ctx := context.Background()
+	_, err := ar.db.NewDelete().Model((*DBAward)(nil)).Where("id = ?", id).Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("could not delete award with id: %v: %v", id, err)
+	}
+	return nil
+}
+
+func (ar *AwardRepository) UpdateExisting(existing, award *awards.PhishingAward) error {
+	dbAward := &DBAward{
+		ID:       existing.Id,
+		EarnedOn: award.EarnedOn,
+		EmailRef: award.EmailRef,
+		Reason:   int(award.Type),
+		UserID:   int64(award.AssignedTo),
+	}
+	ctx := context.Background()
+
+	_, err := ar.db.NewUpdate().Model(dbAward).WherePK().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf(
+			"could not update existing award: %v with new award: %v: %v",
+			existing,
+			award,
+			err,
+		)
+	}
+	return nil
+}
+
 func toAward(dbAward DBAward) awards.PhishingAward {
 	return awards.PhishingAward{
 		Id:         dbAward.ID,
 		AssignedTo: awards.UserId(dbAward.UserID),
 		EarnedOn:   dbAward.EarnedOn,
-		Type:     awards.AwardType(dbAward.Reason),
+		Type:       awards.AwardType(dbAward.Reason),
 		EmailRef:   dbAward.EmailRef,
 	}
 }

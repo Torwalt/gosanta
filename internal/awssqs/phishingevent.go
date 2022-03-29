@@ -1,4 +1,4 @@
-package eventreading
+package awssqs
 
 import (
 	"encoding/json"

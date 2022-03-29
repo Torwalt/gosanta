@@ -9,7 +9,7 @@
       user_id: 1
       earned_on: '{{ now }}'
       reason: 1
-      email_ref: "f20416ef-15d5-4159-9bef-de150edfa970"
+      email_ref: "35e336b2-5339-49b1-84c7-eff77d7fd120"
     - _id: different
       user_id: 2
       earned_on: '{{ now }}'

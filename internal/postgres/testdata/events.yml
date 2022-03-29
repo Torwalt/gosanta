@@ -6,8 +6,16 @@
       action: 0
       email_ref: "f20416ef-15d5-4159-9bef-de150edfa970"
       processed_at: null
+    - _id: clicked
+      user_id: 1
+      created_at: '{{ now }}'
+      action: 1
+      email_ref: "af4736f1-145b-4668-8250-131977d2e475"
+      processed_at: null
 
 - model: DBUser
   rows:
     - _id: one
+      company_id: 1
+    - _id: two
       company_id: 1

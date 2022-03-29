@@ -33,6 +33,46 @@ func NewPhishingEventRepository(sqlDb *sql.DB) *PhishingEventRepository {
 	return &PhishingEventRepository{db: db}
 }
 
+func (per *PhishingEventRepository) ClickedExists(
+	uID awards.UserId,
+	emailRef string,
+) (bool, error) {
+	ctx := context.Background()
+
+	exists, err := per.db.NewSelect().
+		Model((*DBPhishingEvent)(nil)).
+		Where("user_id = ? AND email_ref = ? AND action = ?", uID, emailRef, awards.Clicked).
+		Exists(ctx)
+	if err != nil {
+		return false, fmt.Errorf(
+			"could not retrieve clicked event for user_id %v and email_ref %v: %v",
+			uID,
+			emailRef,
+			err,
+		)
+	}
+
+	return exists, nil
+}
+
+func (per *PhishingEventRepository) MarkAsProcessed(event *awards.UserPhishingEvent) error {
+	now := time.Now()
+	event.ProcessedAt = &now
+	ctx := context.Background()
+	dbpe := fromPhishingEvent(*event)
+
+	_, err := per.db.NewUpdate().
+		Model(&dbpe).
+		Column("processed_at").
+		Where("id = ?", event.ID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("could not update processed_at of event: %v: %v", event, err)
+	}
+
+	return nil
+}
+
 func (per *PhishingEventRepository) GetUnprocessed() ([]awards.UserPhishingEvent, error) {
 	var dbPhishingEvents []DBPhishingEvent
 	var phishingEvents []awards.UserPhishingEvent
@@ -73,5 +113,16 @@ func toPhishingEvent(dbpe DBPhishingEvent) awards.UserPhishingEvent {
 		CreatedAt:   dbpe.CreatedAt,
 		EmailRef:    dbpe.EmailRef,
 		ProcessedAt: dbpe.ProcessedAt,
+	}
+}
+
+func fromPhishingEvent(event awards.UserPhishingEvent) DBPhishingEvent {
+	return DBPhishingEvent{
+		ID:          event.ID,
+		UserID:      int64(event.UserID),
+		Action:      int(event.Action),
+		CreatedAt:   event.CreatedAt,
+		EmailRef:    event.EmailRef,
+		ProcessedAt: event.ProcessedAt,
 	}
 }

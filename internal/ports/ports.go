@@ -7,29 +7,21 @@ import (
 	"gosanta/pkg"
 )
 
-type CreatePhishingAward struct {
-	Id       awards.UserId
-	EmailRef string
-	Action   awards.PhishingAction
-}
-
 type AwardReadRepository interface {
 	Get(id int64) (*awards.PhishingAward, error)
-	GetByUserId(id awards.UserId) ([]awards.PhishingAward, error)
+	GetUserAwards(id awards.UserId) ([]awards.PhishingAward, error)
+	GetByEmailRef(id awards.UserId, ref string) (*awards.PhishingAward, error)
 }
 
 type AwardRepository interface {
 	AwardReadRepository
-	Add(a *awards.PhishingAward) (*awards.PhishingAward, error)
-	Delete(id int) error
+	Add(award *awards.PhishingAward) error
+	UpdateExisting(existing, award *awards.PhishingAward) error
+	Delete(id int64) error
 }
 
 type UserReadRepository interface {
 	Get(uId awards.UserId) (*awards.User, error)
-}
-
-type AwardAssigningService interface {
-	HandlePhishingEvent(cpa *CreatePhishingAward)
 }
 
 type AwardReadingService interface {
@@ -40,6 +32,12 @@ type AwardReadingService interface {
 
 type EventReadRepository interface {
 	GetUnprocessed() ([]awards.UserPhishingEvent, error)
+	ClickedExists(uID awards.UserId, emailRef string) (bool, error)
+}
+
+type EventRepositoryProcessor interface {
+	EventReadRepository
+	MarkAsProcessed(event *awards.UserPhishingEvent) error
 }
 
 type EventRepository interface {

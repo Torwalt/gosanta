@@ -6,7 +6,6 @@ package mocks
 
 import (
 	awards "gosanta/internal"
-	ports "gosanta/internal/ports"
 	events "gosanta/pkg"
 	reflect "reflect"
 
@@ -51,19 +50,34 @@ func (mr *MockAwardReadRepositoryMockRecorder) Get(id interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockAwardReadRepository)(nil).Get), id)
 }
 
-// GetByUserId mocks base method.
-func (m *MockAwardReadRepository) GetByUserId(id awards.UserId) ([]awards.PhishingAward, error) {
+// GetByEmailRef mocks base method.
+func (m *MockAwardReadRepository) GetByEmailRef(id awards.UserId, ref string) (*awards.PhishingAward, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByUserId", id)
+	ret := m.ctrl.Call(m, "GetByEmailRef", id, ref)
+	ret0, _ := ret[0].(*awards.PhishingAward)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByEmailRef indicates an expected call of GetByEmailRef.
+func (mr *MockAwardReadRepositoryMockRecorder) GetByEmailRef(id, ref interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmailRef", reflect.TypeOf((*MockAwardReadRepository)(nil).GetByEmailRef), id, ref)
+}
+
+// GetUserAwards mocks base method.
+func (m *MockAwardReadRepository) GetUserAwards(id awards.UserId) ([]awards.PhishingAward, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserAwards", id)
 	ret0, _ := ret[0].([]awards.PhishingAward)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetByUserId indicates an expected call of GetByUserId.
-func (mr *MockAwardReadRepositoryMockRecorder) GetByUserId(id interface{}) *gomock.Call {
+// GetUserAwards indicates an expected call of GetUserAwards.
+func (mr *MockAwardReadRepositoryMockRecorder) GetUserAwards(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUserId", reflect.TypeOf((*MockAwardReadRepository)(nil).GetByUserId), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAwards", reflect.TypeOf((*MockAwardReadRepository)(nil).GetUserAwards), id)
 }
 
 // MockAwardRepository is a mock of AwardRepository interface.
@@ -90,22 +104,21 @@ func (m *MockAwardRepository) EXPECT() *MockAwardRepositoryMockRecorder {
 }
 
 // Add mocks base method.
-func (m *MockAwardRepository) Add(a *awards.PhishingAward) (*awards.PhishingAward, error) {
+func (m *MockAwardRepository) Add(award *awards.PhishingAward) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Add", a)
-	ret0, _ := ret[0].(*awards.PhishingAward)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "Add", award)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Add indicates an expected call of Add.
-func (mr *MockAwardRepositoryMockRecorder) Add(a interface{}) *gomock.Call {
+func (mr *MockAwardRepositoryMockRecorder) Add(award interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockAwardRepository)(nil).Add), a)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Add", reflect.TypeOf((*MockAwardRepository)(nil).Add), award)
 }
 
 // Delete mocks base method.
-func (m *MockAwardRepository) Delete(id int) error {
+func (m *MockAwardRepository) Delete(id int64) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", id)
 	ret0, _ := ret[0].(error)
@@ -133,19 +146,48 @@ func (mr *MockAwardRepositoryMockRecorder) Get(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockAwardRepository)(nil).Get), id)
 }
 
-// GetByUserId mocks base method.
-func (m *MockAwardRepository) GetByUserId(id awards.UserId) ([]awards.PhishingAward, error) {
+// GetByEmailRef mocks base method.
+func (m *MockAwardRepository) GetByEmailRef(id awards.UserId, ref string) (*awards.PhishingAward, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByUserId", id)
+	ret := m.ctrl.Call(m, "GetByEmailRef", id, ref)
+	ret0, _ := ret[0].(*awards.PhishingAward)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByEmailRef indicates an expected call of GetByEmailRef.
+func (mr *MockAwardRepositoryMockRecorder) GetByEmailRef(id, ref interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByEmailRef", reflect.TypeOf((*MockAwardRepository)(nil).GetByEmailRef), id, ref)
+}
+
+// GetUserAwards mocks base method.
+func (m *MockAwardRepository) GetUserAwards(id awards.UserId) ([]awards.PhishingAward, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserAwards", id)
 	ret0, _ := ret[0].([]awards.PhishingAward)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetByUserId indicates an expected call of GetByUserId.
-func (mr *MockAwardRepositoryMockRecorder) GetByUserId(id interface{}) *gomock.Call {
+// GetUserAwards indicates an expected call of GetUserAwards.
+func (mr *MockAwardRepositoryMockRecorder) GetUserAwards(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByUserId", reflect.TypeOf((*MockAwardRepository)(nil).GetByUserId), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserAwards", reflect.TypeOf((*MockAwardRepository)(nil).GetUserAwards), id)
+}
+
+// UpdateExisting mocks base method.
+func (m *MockAwardRepository) UpdateExisting(existing, award *awards.PhishingAward) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateExisting", existing, award)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateExisting indicates an expected call of UpdateExisting.
+func (mr *MockAwardRepositoryMockRecorder) UpdateExisting(existing, award interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateExisting", reflect.TypeOf((*MockAwardRepository)(nil).UpdateExisting), existing, award)
 }
 
 // MockUserReadRepository is a mock of UserReadRepository interface.
@@ -184,41 +226,6 @@ func (m *MockUserReadRepository) Get(uId awards.UserId) (*awards.User, error) {
 func (mr *MockUserReadRepositoryMockRecorder) Get(uId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockUserReadRepository)(nil).Get), uId)
-}
-
-// MockAwardAssigningService is a mock of AwardAssigningService interface.
-type MockAwardAssigningService struct {
-	ctrl     *gomock.Controller
-	recorder *MockAwardAssigningServiceMockRecorder
-}
-
-// MockAwardAssigningServiceMockRecorder is the mock recorder for MockAwardAssigningService.
-type MockAwardAssigningServiceMockRecorder struct {
-	mock *MockAwardAssigningService
-}
-
-// NewMockAwardAssigningService creates a new mock instance.
-func NewMockAwardAssigningService(ctrl *gomock.Controller) *MockAwardAssigningService {
-	mock := &MockAwardAssigningService{ctrl: ctrl}
-	mock.recorder = &MockAwardAssigningServiceMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockAwardAssigningService) EXPECT() *MockAwardAssigningServiceMockRecorder {
-	return m.recorder
-}
-
-// HandlePhishingEvent mocks base method.
-func (m *MockAwardAssigningService) HandlePhishingEvent(cpa *ports.CreatePhishingAward) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "HandlePhishingEvent", cpa)
-}
-
-// HandlePhishingEvent indicates an expected call of HandlePhishingEvent.
-func (mr *MockAwardAssigningServiceMockRecorder) HandlePhishingEvent(cpa interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandlePhishingEvent", reflect.TypeOf((*MockAwardAssigningService)(nil).HandlePhishingEvent), cpa)
 }
 
 // MockAwardReadingService is a mock of AwardReadingService interface.
@@ -312,6 +319,21 @@ func (m *MockEventReadRepository) EXPECT() *MockEventReadRepositoryMockRecorder 
 	return m.recorder
 }
 
+// ClickedExists mocks base method.
+func (m *MockEventReadRepository) ClickedExists(uID awards.UserId, emailRef string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ClickedExists", uID, emailRef)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ClickedExists indicates an expected call of ClickedExists.
+func (mr *MockEventReadRepositoryMockRecorder) ClickedExists(uID, emailRef interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClickedExists", reflect.TypeOf((*MockEventReadRepository)(nil).ClickedExists), uID, emailRef)
+}
+
 // GetUnprocessed mocks base method.
 func (m *MockEventReadRepository) GetUnprocessed() ([]awards.UserPhishingEvent, error) {
 	m.ctrl.T.Helper()
@@ -325,6 +347,73 @@ func (m *MockEventReadRepository) GetUnprocessed() ([]awards.UserPhishingEvent, 
 func (mr *MockEventReadRepositoryMockRecorder) GetUnprocessed() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUnprocessed", reflect.TypeOf((*MockEventReadRepository)(nil).GetUnprocessed))
+}
+
+// MockEventRepositoryProcessor is a mock of EventRepositoryProcessor interface.
+type MockEventRepositoryProcessor struct {
+	ctrl     *gomock.Controller
+	recorder *MockEventRepositoryProcessorMockRecorder
+}
+
+// MockEventRepositoryProcessorMockRecorder is the mock recorder for MockEventRepositoryProcessor.
+type MockEventRepositoryProcessorMockRecorder struct {
+	mock *MockEventRepositoryProcessor
+}
+
+// NewMockEventRepositoryProcessor creates a new mock instance.
+func NewMockEventRepositoryProcessor(ctrl *gomock.Controller) *MockEventRepositoryProcessor {
+	mock := &MockEventRepositoryProcessor{ctrl: ctrl}
+	mock.recorder = &MockEventRepositoryProcessorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockEventRepositoryProcessor) EXPECT() *MockEventRepositoryProcessorMockRecorder {
+	return m.recorder
+}
+
+// ClickedExists mocks base method.
+func (m *MockEventRepositoryProcessor) ClickedExists(uID awards.UserId, emailRef string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ClickedExists", uID, emailRef)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ClickedExists indicates an expected call of ClickedExists.
+func (mr *MockEventRepositoryProcessorMockRecorder) ClickedExists(uID, emailRef interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClickedExists", reflect.TypeOf((*MockEventRepositoryProcessor)(nil).ClickedExists), uID, emailRef)
+}
+
+// GetUnprocessed mocks base method.
+func (m *MockEventRepositoryProcessor) GetUnprocessed() ([]awards.UserPhishingEvent, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUnprocessed")
+	ret0, _ := ret[0].([]awards.UserPhishingEvent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUnprocessed indicates an expected call of GetUnprocessed.
+func (mr *MockEventRepositoryProcessorMockRecorder) GetUnprocessed() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUnprocessed", reflect.TypeOf((*MockEventRepositoryProcessor)(nil).GetUnprocessed))
+}
+
+// MarkAsProcessed mocks base method.
+func (m *MockEventRepositoryProcessor) MarkAsProcessed(event *awards.UserPhishingEvent) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MarkAsProcessed", event)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// MarkAsProcessed indicates an expected call of MarkAsProcessed.
+func (mr *MockEventRepositoryProcessorMockRecorder) MarkAsProcessed(event interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MarkAsProcessed", reflect.TypeOf((*MockEventRepositoryProcessor)(nil).MarkAsProcessed), event)
 }
 
 // MockEventRepository is a mock of EventRepository interface.
@@ -348,6 +437,21 @@ func NewMockEventRepository(ctrl *gomock.Controller) *MockEventRepository {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockEventRepository) EXPECT() *MockEventRepositoryMockRecorder {
 	return m.recorder
+}
+
+// ClickedExists mocks base method.
+func (m *MockEventRepository) ClickedExists(uID awards.UserId, emailRef string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ClickedExists", uID, emailRef)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ClickedExists indicates an expected call of ClickedExists.
+func (mr *MockEventRepositoryMockRecorder) ClickedExists(uID, emailRef interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClickedExists", reflect.TypeOf((*MockEventRepository)(nil).ClickedExists), uID, emailRef)
 }
 
 // GetUnprocessed mocks base method.

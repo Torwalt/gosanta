@@ -6,6 +6,7 @@ import (
 	"gosanta/internal/postgres"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/uptrace/bun"
@@ -64,11 +65,11 @@ func TestAwardGetNotExists(t *testing.T) {
 	ar := postgres.NewAwardRepository(db.DB)
 
 	a, err := ar.Get(1)
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 	assert.Nil(t, a)
 }
 
-func TestAwardGetByUserId(t *testing.T) {
+func TestAwardGetUserAwards(t *testing.T) {
 	ctx := context.Background()
 	db := getDb(t)
 	resetDb(t, db, ctx)
@@ -81,7 +82,7 @@ func TestAwardGetByUserId(t *testing.T) {
 	}
 
 	uId := awards.UserId(1)
-	awards, err := ar.GetByUserId(uId)
+	awards, err := ar.GetUserAwards(uId)
 	assert.Nil(t, err)
 	assert.NotNil(t, awards)
 
@@ -97,7 +98,103 @@ func TestAwardGetByUserIdNotExists(t *testing.T) {
 	ar := postgres.NewAwardRepository(db.DB)
 
 	uId := awards.UserId(1)
-	awards, err := ar.GetByUserId(uId)
+	awards, err := ar.GetUserAwards(uId)
 	assert.Nil(t, awards)
 	assert.NotNil(t, err)
+}
+
+func TestAwardAdd(t *testing.T) {
+	ctx := context.Background()
+	db := getDb(t)
+	resetDb(t, db, ctx)
+	ar := postgres.NewAwardRepository(db.DB)
+
+	fixture := dbfixture.New(db)
+	err := fixture.Load(ctx, os.DirFS("testdata"), "awards.yml")
+	if err != nil {
+		t.Errorf("could not load fixture: %v", err)
+	}
+
+	pa := &awards.PhishingAward{
+		AssignedTo: awards.UserId(1),
+		EarnedOn:   time.Now(),
+		Type:       awards.OpenAward,
+		EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
+	}
+	err = ar.Add(pa)
+
+	assert.Nil(t, err)
+}
+
+func TestAwardDelete(t *testing.T) {
+	ctx := context.Background()
+	db := getDb(t)
+	resetDb(t, db, ctx)
+	ar := postgres.NewAwardRepository(db.DB)
+
+	fixture := dbfixture.New(db, dbfixture.WithRecreateTables())
+	err := fixture.Load(ctx, os.DirFS("testdata"), "awards.yml")
+	if err != nil {
+		t.Errorf("could not load fixture: %v", err)
+	}
+
+	err = ar.Delete(1)
+	assert.Nil(t, err)
+
+	a, err := ar.Get(1)
+	assert.Nil(t, err)
+	assert.Nil(t, a)
+}
+
+func TestAwardGetByEmailRef(t *testing.T) {
+	ctx := context.Background()
+	db := getDb(t)
+	resetDb(t, db, ctx)
+	ar := postgres.NewAwardRepository(db.DB)
+
+	fixture := dbfixture.New(db, dbfixture.WithRecreateTables())
+	err := fixture.Load(ctx, os.DirFS("testdata"), "awards.yml")
+	if err != nil {
+		t.Errorf("could not load fixture: %v", err)
+	}
+
+	a, err := ar.GetByEmailRef(1, "f20416ef-15d5-4159-9bef-de150edfa970")
+	assert.Nil(t, err)
+	assert.NotNil(t, a)
+
+	assert.Equal(t, int64(1), a.Id)
+	assert.Equal(t, awards.OpenAward, a.Type)
+	assert.Equal(t, awards.UserId(1), a.AssignedTo)
+	assert.Equal(t, "f20416ef-15d5-4159-9bef-de150edfa970", a.EmailRef)
+}
+
+func TestAwardUpdateExisting(t *testing.T) {
+	ctx := context.Background()
+	db := getDb(t)
+	resetDb(t, db, ctx)
+	ar := postgres.NewAwardRepository(db.DB)
+
+	fixture := dbfixture.New(db, dbfixture.WithRecreateTables())
+	err := fixture.Load(ctx, os.DirFS("testdata"), "awards.yml")
+	if err != nil {
+		t.Errorf("could not load fixture: %v", err)
+	}
+
+	existingAward := &awards.PhishingAward{
+		Id:         1,
+		AssignedTo: awards.UserId(1),
+		EarnedOn:   time.Now(),
+		Type:       awards.OpenAward,
+		EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
+	}
+	newAward := &awards.PhishingAward{
+		Id:         1,
+		AssignedTo: awards.UserId(1),
+		EarnedOn:   time.Now().Add(time.Duration(100)),
+		Type:       awards.ReportAward,
+		EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
+	}
+	err = ar.UpdateExisting(existingAward, newAward)
+
+	assert.Nil(t, err)
 }

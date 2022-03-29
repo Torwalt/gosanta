@@ -1,7 +1,7 @@
-package eventreading_test
+package awssqs_test
 
 import (
-	"gosanta/internal/eventreading"
+	"gosanta/internal/awssqs"
 	"gosanta/internal/mocks"
 	events "gosanta/pkg"
 	"testing"
@@ -16,7 +16,7 @@ func TestGetNextMessages(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	sqsMock := mocks.NewMockSQSGetDeleter(ctrl)
 	queueUrl := "some-queue-url"
-	eventReader := eventreading.New(sqsMock, queueUrl)
+	eventReader := awssqs.New(sqsMock, queueUrl)
 
 	nbrM := int64(10)
 	expRMI := sqs.ReceiveMessageInput{MaxNumberOfMessages: &nbrM, QueueUrl: &queueUrl}
