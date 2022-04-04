@@ -22,3 +22,5 @@
       company_id: 1
     - _id: two
       company_id: 1
+    - _id: three
+      company_id: 2

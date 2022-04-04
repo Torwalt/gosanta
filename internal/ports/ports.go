@@ -22,12 +22,13 @@ type AwardRepository interface {
 
 type UserReadRepository interface {
 	Get(uId awards.UserId) (*awards.User, error)
+	GetCompanyUsers(cId awards.CompanyId) ([]awards.User, error)
 }
 
 type AwardReadingService interface {
-	Get(id string) (awards.PhishingAward, error)
+	Get(id int64) (*awards.PhishingAward, error)
 	GetUserAwards(uId awards.UserId) ([]awards.PhishingAward, error)
-	GetCompanyAwards(cId awards.CompanyId) ([]awards.PhishingAward, error)
+	CalcLeaderboard(uId awards.UserId) (*awards.Leaderboard, error) 
 }
 
 type EventReadRepository interface {

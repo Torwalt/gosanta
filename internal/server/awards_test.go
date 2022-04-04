@@ -34,7 +34,7 @@ func TestGetUserAwards(t *testing.T) {
 			Id:         1,
 			AssignedTo: userId,
 			EarnedOn:   time.Now(),
-			Type:     awards.OpenAward,
+			Type:       awards.OpenAward,
 			EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 		},
 	}
@@ -114,7 +114,7 @@ func TestGetUserAwardsErrors(t *testing.T) {
 					Id:         1,
 					AssignedTo: test.ActualUserId,
 					EarnedOn:   time.Now(),
-					Type:     awards.OpenAward,
+					Type:       awards.OpenAward,
 					EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 				},
 			}
@@ -129,4 +129,54 @@ func TestGetUserAwardsErrors(t *testing.T) {
 		})
 	}
 
+}
+
+func TestCalcLeaderboard(t *testing.T) {
+	userId := awards.UserId(1)
+	url := "/awards/v1/user/1/leaderboard"
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+
+	assert.Nil(t, err)
+
+	rr := httptest.NewRecorder()
+	ctrl := gomock.NewController(t)
+	arSrv := mocks.NewMockAwardReadingService(ctrl)
+
+	lb := &awards.Leaderboard{
+		RankedUsers: []awards.LeaderboardMember{
+			{
+				UserId:       userId,
+				UserFullName: "Roboute Guilliman",
+				Score:        60,
+				Summary: awards.AwardSummary{
+					IgnoringAward: 0,
+					OpenAward:     0,
+					ReportAward:   10,
+				},
+				Rank: 1,
+			},
+		},
+	}
+	arSrv.EXPECT().CalcLeaderboard(userId).Return(lb, nil)
+	srv := server.New(arSrv)
+	srv.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+	gotS := []server.LeaderboardMember{}
+	wantS := []server.LeaderboardMember{
+		{
+			UserId:       int(userId),
+			UserFullName: "Roboute Guilliman",
+			Score:        60,
+			IgnoreCount:  0,
+			OpenCount:    0,
+			ReportCount:  10,
+			Rank:         1,
+		},
+	}
+	err = json.NewDecoder(rr.Body).Decode(&gotS)
+
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, wantS, gotS)
 }

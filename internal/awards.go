@@ -35,6 +35,20 @@ func (a AwardType) String() string {
 	}
 }
 
+// Amount of points an award is worth from a gamification perspective.
+func (a AwardType) Points() int {
+	switch a {
+	case IgnoreAward:
+		return 1
+	case OpenAward:
+		return 2
+	case ReportAward:
+		return 3
+	default:
+		return 0
+	}
+}
+
 // An award assigned for correctly interacting with a pyphish phishing email.
 type PhishingAward struct {
 	Id         int64
@@ -45,7 +59,7 @@ type PhishingAward struct {
 }
 
 // A PhishingAward cannot be upgraded or removed, if it was assigned and stayed
-// assigned to a user for AwardProtectedAfterDays.
+// assigned to a user for AwardProtectedAfterDays amount of days.
 func (a *PhishingAward) IsProtected() bool {
 	now := time.Now()
 	protectedAt := now.AddDate(0, 0, -AwardProtectedAfterDays)
@@ -60,14 +74,15 @@ func (a *PhishingAward) IsProtected() bool {
 // training phishing email.
 //
 // Actions if an award already exists:
-// 1. Upgrade an OpenAward to a ReportAward. UserPhishingEvent must be of PhishingAction Opened.
+// 1. Upgrade an OpenAward to a ReportAward. UserPhishingEvent must be of PhishingAction Reported.
 //    The existing award should not be protected.
 // 2. Remove existing award. If PhishingAction is Clicked and award not protected.
-// 3. Do nothing. If user has existing IgnoreAward or award is protected or award exists already.
+// 3. Do nothing. If user has existing IgnoreAward or existing award is protected or
+//    award exists already.
 //
 // Actions if no award exists:
 // 1. Assign AwardType based on PhishingAction.
-// 2. Do nothing. If PhishingAction is Clicked.
+// 2. Do nothing, if PhishingAction is Clicked.
 func New(
 	u User,
 	event UserPhishingEvent,

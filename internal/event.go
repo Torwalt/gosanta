@@ -18,6 +18,7 @@ const (
 	Ignored
 )
 
+// Map a PhishingAction to an AwardType.
 func (p PhishingAction) ToAwardType() AwardType {
 	switch p {
 	case Opened:
@@ -31,6 +32,7 @@ func (p PhishingAction) ToAwardType() AwardType {
 	}
 }
 
+// String representation of a PhishingAction.
 func (a PhishingAction) String() string {
 	switch a {
 	case Opened:
@@ -46,6 +48,7 @@ func (a PhishingAction) String() string {
 	}
 }
 
+// Expected strings to map to a PhishingAction instance.
 func ToPhishingAction(action string) PhishingAction {
 	switch action {
 	case "opened":
@@ -62,6 +65,8 @@ func ToPhishingAction(action string) PhishingAction {
 }
 
 // A user interaction with a phishing mail.
+// An event can be processed, meaning, that an award was assigned/unassigned or nothing was done.
+// Initially, an event has ProcessedAt == nil.
 type UserPhishingEvent struct {
 	ID          int64
 	UserID      UserId

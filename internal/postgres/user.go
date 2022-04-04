@@ -24,6 +24,7 @@ type userRepository struct {
 
 func NewUserRepository(sqlDb *sql.DB) *userRepository {
 	db := bun.NewDB(sqlDb, pgdialect.New())
+	db.RegisterModel((*DBUser)(nil))
 	return &userRepository{db: db}
 }
 
@@ -45,6 +46,28 @@ func (ar *userRepository) Get(id awards.UserId) (*awards.User, error) {
 	return &pa, nil
 }
 
+func (ar *userRepository) GetCompanyUsers(cId awards.CompanyId) ([]awards.User, error) {
+	var dbUsers []DBUser
+	var users []awards.User
+
+	ctx := context.Background()
+	err := ar.db.NewSelect().Model(&dbUsers).Relation("Awards").Where("company_id = ?", cId).Scan(ctx)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return users, &awards.Error{
+				Code: awards.DoesNotExistError,
+				Err:  fmt.Errorf("no user with id: %v", cId),
+			}
+		}
+		return users, err
+	}
+
+	for _, dbUser := range dbUsers {
+		users = append(users, toUser(dbUser))
+	}
+	return users, nil
+}
+
 func toUser(dbUser DBUser) awards.User {
 	var awardS []awards.PhishingAward
 	for _, dba := range dbUser.Awards {
@@ -54,6 +77,6 @@ func toUser(dbUser DBUser) awards.User {
 	return awards.User{
 		Id:        awards.UserId(dbUser.ID),
 		CompanyId: awards.CompanyId(dbUser.CompanyId),
-		Awards: awardS,
+		Awards:    awardS,
 	}
 }

@@ -228,6 +228,21 @@ func (mr *MockUserReadRepositoryMockRecorder) Get(uId interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockUserReadRepository)(nil).Get), uId)
 }
 
+// GetCompanyUsers mocks base method.
+func (m *MockUserReadRepository) GetCompanyUsers(cId awards.CompanyId) ([]awards.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCompanyUsers", cId)
+	ret0, _ := ret[0].([]awards.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCompanyUsers indicates an expected call of GetCompanyUsers.
+func (mr *MockUserReadRepositoryMockRecorder) GetCompanyUsers(cId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCompanyUsers", reflect.TypeOf((*MockUserReadRepository)(nil).GetCompanyUsers), cId)
+}
+
 // MockAwardReadingService is a mock of AwardReadingService interface.
 type MockAwardReadingService struct {
 	ctrl     *gomock.Controller
@@ -251,11 +266,26 @@ func (m *MockAwardReadingService) EXPECT() *MockAwardReadingServiceMockRecorder 
 	return m.recorder
 }
 
+// CalcLeaderboard mocks base method.
+func (m *MockAwardReadingService) CalcLeaderboard(uId awards.UserId) (*awards.Leaderboard, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CalcLeaderboard", uId)
+	ret0, _ := ret[0].(*awards.Leaderboard)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CalcLeaderboard indicates an expected call of CalcLeaderboard.
+func (mr *MockAwardReadingServiceMockRecorder) CalcLeaderboard(uId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CalcLeaderboard", reflect.TypeOf((*MockAwardReadingService)(nil).CalcLeaderboard), uId)
+}
+
 // Get mocks base method.
-func (m *MockAwardReadingService) Get(id string) (awards.PhishingAward, error) {
+func (m *MockAwardReadingService) Get(id int64) (*awards.PhishingAward, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Get", id)
-	ret0, _ := ret[0].(awards.PhishingAward)
+	ret0, _ := ret[0].(*awards.PhishingAward)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -264,21 +294,6 @@ func (m *MockAwardReadingService) Get(id string) (awards.PhishingAward, error) {
 func (mr *MockAwardReadingServiceMockRecorder) Get(id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockAwardReadingService)(nil).Get), id)
-}
-
-// GetCompanyAwards mocks base method.
-func (m *MockAwardReadingService) GetCompanyAwards(cId awards.CompanyId) ([]awards.PhishingAward, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCompanyAwards", cId)
-	ret0, _ := ret[0].([]awards.PhishingAward)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetCompanyAwards indicates an expected call of GetCompanyAwards.
-func (mr *MockAwardReadingServiceMockRecorder) GetCompanyAwards(cId interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCompanyAwards", reflect.TypeOf((*MockAwardReadingService)(nil).GetCompanyAwards), cId)
 }
 
 // GetUserAwards mocks base method.

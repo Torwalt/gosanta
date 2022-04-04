@@ -43,3 +43,24 @@ func TestUserGetNotExists(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Nil(t, user)
 }
+
+func TestUserGetCompanyUsers(t *testing.T) {
+	ctx := context.Background()
+	db := getDb(t)
+	resetDb(t, db, ctx)
+	ur := postgres.NewUserRepository(db.DB)
+
+	fixture := dbfixture.New(db)
+	err := fixture.Load(ctx, os.DirFS("testdata"), "awards.yml")
+	if err != nil {
+		t.Errorf("could not load fixture: %v", err)
+	}
+
+	expCompID := awards.CompanyId(1)
+	users, err := ur.GetCompanyUsers(expCompID)
+	assert.Nil(t, err)
+	assert.NotNil(t, users)
+	assert.Equal(t, 2, len(users))
+	assert.Equal(t, expCompID, users[0].CompanyId)
+	assert.Equal(t, expCompID, users[1].CompanyId)
+}

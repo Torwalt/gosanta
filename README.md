@@ -67,7 +67,7 @@ what the application does, and domain types should mirror business objects.
    as the phishing events, and could be processed by the same command.
 2. Swagger/OpenAPI doc gen.
    Should be put into the pkg directory.
-3. Finish ranking service and HTTP interaction with it.
+3. Logging and metrics.
 4. CI/CD?
 
 ## Considerations

@@ -1,23 +1,21 @@
 package awards
 
+import "fmt"
+
 type UserId int64
 type CompanyId int64
 
 // A user that can receive an award.
 type User struct {
 	Id        UserId
+	FirstName string
+	LastName  string
 	CompanyId CompanyId
 	Awards    []PhishingAward
 }
 
-// Return award received for the interaction with a phishing mail.
-func (u *User) FindRelatedAward(emailRef string) *PhishingAward {
-	for _, a := range u.Awards {
-		if a.EmailRef == emailRef {
-			return &a
-		}
-	}
-	return nil
+func (u *User) FullName() string {
+	return fmt.Sprintf("%v %v", u.FirstName, u.LastName)
 }
 
 // A company to which users belong.

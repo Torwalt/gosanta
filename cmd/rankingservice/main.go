@@ -33,7 +33,7 @@ func run() error {
 	awardRepo := postgres.NewAwardRepository(sqldb)
 	userRepo := postgres.NewUserRepository(sqldb)
 
-	r := ranking.New(awardRepo, userRepo)
+	r := ranking.NewService(awardRepo, userRepo)
 
 	srv := server.New(&r)
 
