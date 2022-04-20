@@ -6,20 +6,23 @@ This is test project to explore DDD & Hexagonal design patterns in golang. Inspi
 
 ## Prerequisites
 
-- golang
+- golang 1.17
 - docker
 - make
 
 ## Init
 
-- cp example.env .env
+- `cp example.env .env`
 - fill out missing env vars
 - `make run-docker-composed`
 - `make init-db`
 
 ## Running Tests
 
+- db connection with docker needed before running tests
 - `make test`
+- for coverage report
+- `make test-cov`
 
 ## Domain
 
@@ -68,7 +71,8 @@ what the application does, and domain types should mirror business objects.
 2. Swagger/OpenAPI doc gen.
    Should be put into the pkg directory.
 3. Logging and metrics.
-4. CI/CD?
+4. Auth?
+5. CI/CD?
 
 ## Considerations
 

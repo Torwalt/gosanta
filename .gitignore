@@ -1,5 +1,5 @@
 .git
 .env
 cover.out
-gobreach_server
-awardservice
+/bin
+!/bin/.start.sh

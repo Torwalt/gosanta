@@ -24,9 +24,8 @@ func main() {
 func run() error {
 	sess := session.New()
 	s := sqs.New(sess)
-	er := awssqs.New(s, "asd")
-
 	config := loadFromEnv()
+	er := awssqs.New(s, config.queueURL)
 
 	pconf := postgres.Config{
 		Host:   config.postgres_host,
