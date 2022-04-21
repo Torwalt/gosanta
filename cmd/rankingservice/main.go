@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gosanta/internal/postgres"
 	"gosanta/internal/ranking"
-	"gosanta/internal/server"
+	"gosanta/internal/rest"
 	"net/http"
 	"os"
 )
@@ -35,7 +35,7 @@ func run() error {
 
 	r := ranking.NewService(awardRepo, userRepo)
 
-	srv := server.New(&r)
+	srv := rest.New(&r)
 
 	err := http.ListenAndServe(":"+config.http_port, &srv)
 	if err != nil {

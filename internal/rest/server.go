@@ -1,4 +1,4 @@
-package server
+package rest
 
 import (
 	"encoding/json"
@@ -13,8 +13,7 @@ import (
 
 type Server struct {
 	awardService ports.AwardReadingService
-
-	router chi.Router
+	router       chi.Router
 }
 
 func New(awardService ports.AwardReadingService) Server {

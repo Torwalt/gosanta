@@ -132,11 +132,6 @@ packages that could also deal with data persistence but not with a RDBS but a
 NoSQL db like mongodb. Or with other RDBS like MySQL. Also, this makes the
 folder structure flatter, which is more readable imho.
 
-Another consideration would be the renaming of the `server` package to
-something like `http` or `httpsrv`. This would be consistent with the
-argumentation above, to have package names that cover the technology used. In
-the end, a server could also be a RPC server.
-
 With such a naming convention, folders of application services can be
 differentiated from infrastructure just by a glance on the folder structure.
 

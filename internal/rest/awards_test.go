@@ -1,4 +1,4 @@
-package server_test
+package rest_test
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 
 	awards "gosanta/internal"
 	"gosanta/internal/mocks"
-	"gosanta/internal/server"
+	"gosanta/internal/rest"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -39,12 +39,12 @@ func TestGetUserAwards(t *testing.T) {
 		},
 	}
 	arSrv.EXPECT().GetUserAwards(userId).Return(awardS, nil)
-	srv := server.New(arSrv)
+	srv := rest.New(arSrv)
 	srv.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusOK, rr.Code)
-	gotS := []server.UserAwardResponse{}
-	want := server.UserAwardResponse{
+	gotS := []rest.UserAwardResponse{}
+	want := rest.UserAwardResponse{
 		Id:        awardS[0].Id,
 		UserId:    int(awardS[0].AssignedTo),
 		CreatedOn: awardS[0].EarnedOn,
@@ -123,7 +123,7 @@ func TestGetUserAwardsErrors(t *testing.T) {
 				arSrv.EXPECT().GetUserAwards(test.ActualUserId).Return(awardS, test.ServiceError)
 			}
 
-			srv := server.New(arSrv)
+			srv := rest.New(arSrv)
 			srv.ServeHTTP(rr, req)
 			assert.Equal(t, test.StatusCode, rr.Code)
 		})
@@ -158,12 +158,12 @@ func TestCalcLeaderboard(t *testing.T) {
 		},
 	}
 	arSrv.EXPECT().CalcLeaderboard(userId).Return(lb, nil)
-	srv := server.New(arSrv)
+	srv := rest.New(arSrv)
 	srv.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusOK, rr.Code)
-	gotS := []server.LeaderboardMember{}
-	wantS := []server.LeaderboardMember{
+	gotS := []rest.LeaderboardMember{}
+	wantS := []rest.LeaderboardMember{
 		{
 			UserId:       int(userId),
 			UserFullName: "Roboute Guilliman",
