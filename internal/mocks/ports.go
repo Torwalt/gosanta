@@ -549,3 +549,153 @@ func (mr *MockEventQueueMockRecorder) GetNextMessages() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNextMessages", reflect.TypeOf((*MockEventQueue)(nil).GetNextMessages))
 }
+
+// MockMailSender is a mock of MailSender interface.
+type MockMailSender struct {
+	ctrl     *gomock.Controller
+	recorder *MockMailSenderMockRecorder
+}
+
+// MockMailSenderMockRecorder is the mock recorder for MockMailSender.
+type MockMailSenderMockRecorder struct {
+	mock *MockMailSender
+}
+
+// NewMockMailSender creates a new mock instance.
+func NewMockMailSender(ctrl *gomock.Controller) *MockMailSender {
+	mock := &MockMailSender{ctrl: ctrl}
+	mock.recorder = &MockMailSenderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMailSender) EXPECT() *MockMailSenderMockRecorder {
+	return m.recorder
+}
+
+// SendToUser mocks base method.
+func (m *MockMailSender) SendToUser(arg0 awards.UserAwardEvent) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendToUser", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendToUser indicates an expected call of SendToUser.
+func (mr *MockMailSenderMockRecorder) SendToUser(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendToUser", reflect.TypeOf((*MockMailSender)(nil).SendToUser), arg0)
+}
+
+// MockEventPublisher is a mock of EventPublisher interface.
+type MockEventPublisher struct {
+	ctrl     *gomock.Controller
+	recorder *MockEventPublisherMockRecorder
+}
+
+// MockEventPublisherMockRecorder is the mock recorder for MockEventPublisher.
+type MockEventPublisherMockRecorder struct {
+	mock *MockEventPublisher
+}
+
+// NewMockEventPublisher creates a new mock instance.
+func NewMockEventPublisher(ctrl *gomock.Controller) *MockEventPublisher {
+	mock := &MockEventPublisher{ctrl: ctrl}
+	mock.recorder = &MockEventPublisherMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockEventPublisher) EXPECT() *MockEventPublisherMockRecorder {
+	return m.recorder
+}
+
+// PublishEvent mocks base method.
+func (m *MockEventPublisher) PublishEvent(arg0 awards.UserAwardEvent) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PublishEvent", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PublishEvent indicates an expected call of PublishEvent.
+func (mr *MockEventPublisherMockRecorder) PublishEvent(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PublishEvent", reflect.TypeOf((*MockEventPublisher)(nil).PublishEvent), arg0)
+}
+
+// MockEventLogReader is a mock of EventLogReader interface.
+type MockEventLogReader struct {
+	ctrl     *gomock.Controller
+	recorder *MockEventLogReaderMockRecorder
+}
+
+// MockEventLogReaderMockRecorder is the mock recorder for MockEventLogReader.
+type MockEventLogReaderMockRecorder struct {
+	mock *MockEventLogReader
+}
+
+// NewMockEventLogReader creates a new mock instance.
+func NewMockEventLogReader(ctrl *gomock.Controller) *MockEventLogReader {
+	mock := &MockEventLogReader{ctrl: ctrl}
+	mock.recorder = &MockEventLogReaderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockEventLogReader) EXPECT() *MockEventLogReaderMockRecorder {
+	return m.recorder
+}
+
+// LogNewEvents mocks base method.
+func (m *MockEventLogReader) LogNewEvents() ([]awards.UserPhishingEvent, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LogNewEvents")
+	ret0, _ := ret[0].([]awards.UserPhishingEvent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LogNewEvents indicates an expected call of LogNewEvents.
+func (mr *MockEventLogReaderMockRecorder) LogNewEvents() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogNewEvents", reflect.TypeOf((*MockEventLogReader)(nil).LogNewEvents))
+}
+
+// MockAwardAssigner is a mock of AwardAssigner interface.
+type MockAwardAssigner struct {
+	ctrl     *gomock.Controller
+	recorder *MockAwardAssignerMockRecorder
+}
+
+// MockAwardAssignerMockRecorder is the mock recorder for MockAwardAssigner.
+type MockAwardAssignerMockRecorder struct {
+	mock *MockAwardAssigner
+}
+
+// NewMockAwardAssigner creates a new mock instance.
+func NewMockAwardAssigner(ctrl *gomock.Controller) *MockAwardAssigner {
+	mock := &MockAwardAssigner{ctrl: ctrl}
+	mock.recorder = &MockAwardAssignerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockAwardAssigner) EXPECT() *MockAwardAssignerMockRecorder {
+	return m.recorder
+}
+
+// AssignAward mocks base method.
+func (m *MockAwardAssigner) AssignAward(event awards.UserPhishingEvent) (awards.UserAwardEvent, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AssignAward", event)
+	ret0, _ := ret[0].(awards.UserAwardEvent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AssignAward indicates an expected call of AssignAward.
+func (mr *MockAwardAssignerMockRecorder) AssignAward(event interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AssignAward", reflect.TypeOf((*MockAwardAssigner)(nil).AssignAward), event)
+}

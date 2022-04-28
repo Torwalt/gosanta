@@ -2,9 +2,7 @@ BINARY_NAME=awardservice
 
 
 build:
-	go build -o ./bin/ranker ./cmd/rankingservice/main.go
-	go build -o ./bin/eventlogger ./cmd/eventreader/main.go
-	go build -o ./bin/awarder ./cmd/awarding/main.go
+	go build -o ./bin/${BINARY_NAME} ./cmd/awarder/main.go
 
 build-docker:
 	sudo docker build \
@@ -32,9 +30,7 @@ run:
 
 clean:
 	go clean
-	rm ./bin/ranker
-	rm ./bin/eventlogger
-	rm ./bin/awarder
+	rm ./bin/${BINARY_NAME}
 
 test:
 	go test ./... -v -short
@@ -45,5 +41,4 @@ test-cov:
 
 init-db:
 	cat ./internal/ports/persistence/sql/schema.sql | psql -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_NAME} -1
-
 

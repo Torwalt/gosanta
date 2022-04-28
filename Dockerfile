@@ -16,7 +16,7 @@ COPY ./internal ./internal
 COPY ./pkg ./pkg
 
 RUN go mod download
-RUN go build -o ./bin/$BINARY_NAME ./cmd/rankingservice/main.go
+RUN go build -o ./bin/${BINARY_NAME} ./cmd/awarder/main.go
 
 EXPOSE $HTTP_PORT
 

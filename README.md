@@ -17,6 +17,12 @@ This is test project to explore DDD & Hexagonal design patterns in golang. Inspi
 - `make run-docker-composed`
 - `make init-db`
 
+**Not End-to-End tested yet**
+
+The service requires and external queue to connect to (i.e. AWS SQS) it does
+not make sense to run it locally. I need to provide a mock implementation of
+ports.EventQueue for that.
+
 ## Running Tests
 
 - db connection with docker needed before running tests

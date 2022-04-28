@@ -6,6 +6,7 @@ import (
 
 	events "gosanta/pkg"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
@@ -27,8 +28,7 @@ func New(s SQSGetDeleter, queueURL string) SQSClient {
 
 func (sc *SQSClient) GetNextMessages() ([]events.PhishingEvent, error) {
 	eventS := []events.PhishingEvent{}
-	nbrM := int64(10)
-	rmi := &sqs.ReceiveMessageInput{MaxNumberOfMessages: &nbrM, QueueUrl: &sc.queueURL}
+	rmi := &sqs.ReceiveMessageInput{MaxNumberOfMessages: aws.Int64(10), QueueUrl: &sc.queueURL}
 
 	rmo, err := sc.s.ReceiveMessage(rmi)
 	if err != nil {

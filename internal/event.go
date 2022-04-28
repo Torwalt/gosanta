@@ -75,3 +75,9 @@ type UserPhishingEvent struct {
 	EmailRef    string
 	ProcessedAt *time.Time
 }
+
+// A user receiving and/or loosing an award.
+type UserAwardEvent struct {
+	Event UserPhishingEvent
+	Award *PhishingAward
+}
