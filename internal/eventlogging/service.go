@@ -25,13 +25,14 @@ func (e *EventLogger) Create(event awards.UserPhishingEvent) error {
 
 // Recursivly consume all current messages from the EventQueue and persist them in the EventRepository.
 // Errors on individual messages are logged and the message is skipped.
-func (e *EventLogger) LogNewEvents() error {
+func (e *EventLogger) LogNewEvents() ([]awards.UserPhishingEvent, error) {
+	var events []awards.UserPhishingEvent
 	msgs, err := e.eventQueue.GetNextMessages()
 	if err != nil {
-		return fmt.Errorf("could not get messages: %v", err)
+		return events, fmt.Errorf("could not get messages: %v", err)
 	}
 	if len(msgs) == 0 {
-		return nil
+		return events, nil
 	}
 	for _, msg := range msgs {
 		action := awards.ToPhishingAction(msg.Action)
@@ -47,6 +48,7 @@ func (e *EventLogger) LogNewEvents() error {
 			fmt.Printf("could not persist phishing event: %v", err)
 			continue
 		}
+		events = append(events, pe)
 		err = e.eventQueue.DeleteMessage(msg.EventId)
 		if err != nil {
 			fmt.Print(err)
@@ -54,9 +56,9 @@ func (e *EventLogger) LogNewEvents() error {
 		}
 	}
 
-	err = e.LogNewEvents()
+	events, err = e.LogNewEvents()
 	if err != nil {
-		return err
+		return events, err
 	}
-	return nil
+	return events, nil
 }

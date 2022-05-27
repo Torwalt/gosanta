@@ -28,7 +28,7 @@ type UserReadRepository interface {
 type AwardReadingService interface {
 	Get(id int64) (*awards.PhishingAward, error)
 	GetUserAwards(uId awards.UserId) ([]awards.PhishingAward, error)
-	CalcLeaderboard(uId awards.UserId) (*awards.Leaderboard, error) 
+	CalcLeaderboard(uId awards.UserId) (*awards.Leaderboard, error)
 }
 
 type EventReadRepository interface {
@@ -49,4 +49,20 @@ type EventRepository interface {
 type EventQueue interface {
 	GetNextMessages() ([]events.PhishingEvent, error)
 	DeleteMessage(eventID string) error
+}
+
+type MailSender interface {
+	SendToUser(awards.UserAwardEvent) error
+}
+
+type EventPublisher interface {
+	PublishEvent(awards.UserAwardEvent) error
+}
+
+type EventLogReader interface {
+	LogNewEvents() ([]awards.UserPhishingEvent, error)
+}
+
+type AwardAssigner interface {
+	AssignAward(event awards.UserPhishingEvent) (awards.UserAwardEvent, error)
 }

@@ -1,8 +1,7 @@
 package awarding
 
 import (
-	"fmt"
-	"gosanta/internal"
+	awards "gosanta/internal"
 	"gosanta/internal/ports"
 )
 
@@ -20,46 +19,33 @@ func NewAwardService(
 	return AwardService{awardRepo: awardRepo, userRepo: userRepo, eventRepo: eventRepo}
 }
 
-// Retrieve unprocessed PhishingEvents and assign or remove awards for the
-// corresponding users based on the interaction with a test phishing mail.
-func (s *AwardService) ProcessPhishingEvents() error {
-	events, err := s.eventRepo.GetUnprocessed()
+// Assign or remove awards for the corresponding users based on the UserPhishingEvent.
+func (s *AwardService) AssignAward(event awards.UserPhishingEvent) (usrAwardEvent awards.UserAwardEvent, err error) {
+	usrAwardEvent, err = s.assignPhishingAward(event)
 	if err != nil {
-		return fmt.Errorf("could not retrieve unprocessed events: %v", err)
+		return usrAwardEvent, err
 	}
-
-	for _, newEvent := range events {
-		err = s.assignPhishingAward(newEvent)
-		if err != nil {
-			// TODO
-			continue
-		}
-		err := s.eventRepo.MarkAsProcessed(&newEvent)
-		if err != nil {
-			// TODO
-			continue
-		}
-	}
-	return nil
+	return usrAwardEvent, nil
 }
 
-func (s *AwardService) assignPhishingAward(event awards.UserPhishingEvent) error {
+func (s *AwardService) assignPhishingAward(event awards.UserPhishingEvent) (awards.UserAwardEvent, error) {
+	userAward := awards.UserAwardEvent{Event: event}
 	clickedExists, err := s.eventRepo.ClickedExists(event.UserID, event.EmailRef)
 	if err != nil {
 		// TODO
-		return err
+		return userAward, err
 	}
 
 	existingAward, err := s.awardRepo.GetByEmailRef(event.UserID, event.EmailRef)
 	if err != nil {
 		// TODO
-		return err
+		return userAward, err
 	}
 
 	user, err := s.userRepo.Get(event.UserID)
 	if err != nil {
 		// TODO
-		return err
+		return userAward, err
 	}
 
 	// Remove existing award if clicked and not protected.
@@ -67,24 +53,27 @@ func (s *AwardService) assignPhishingAward(event awards.UserPhishingEvent) error
 		if existingAward != nil && !existingAward.IsProtected() {
 			err := s.awardRepo.Delete(existingAward.Id)
 			if err != nil {
-				return err
+				return userAward, err
 			}
 		}
-		return nil
+		//
+		return userAward, nil
 	}
 
 	newAward, err := awards.New(*user, event, clickedExists, existingAward)
 	if err != nil {
 		// TODO
-		return err
+		return userAward, err
 	}
+
+	userAward.Award = newAward
 
 	// Award has been upgraded, no new award is created.
 	if existingAward != nil && newAward != nil {
 		err := s.awardRepo.UpdateExisting(existingAward, newAward)
-		return err
+		return userAward, err
 	}
 
 	err = s.awardRepo.Add(newAward)
-	return err
+	return userAward, err
 }

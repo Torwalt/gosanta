@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestProcessPhishingEventsAwardUpdated(t *testing.T) {
+func TestAssignAwardAwardUpdated(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	ar := mocks.NewMockAwardRepository(ctrl)
 	ur := mocks.NewMockUserReadRepository(ctrl)
@@ -26,8 +26,6 @@ func TestProcessPhishingEventsAwardUpdated(t *testing.T) {
 		EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
 		ProcessedAt: nil,
 	}
-	unproEvents := []awards.UserPhishingEvent{event}
-	er.EXPECT().GetUnprocessed().Times(1).Return(unproEvents, nil)
 	er.EXPECT().ClickedExists(event.UserID, event.EmailRef).Return(false, nil)
 
 	existAward := &awards.PhishingAward{
@@ -48,12 +46,14 @@ func TestProcessPhishingEventsAwardUpdated(t *testing.T) {
 	ar.EXPECT().UpdateExisting(existAward, gomock.Any()).Return(nil)
 	ar.EXPECT().Add(gomock.Any()).Times(0)
 
-	er.EXPECT().MarkAsProcessed(gomock.Any()).Return(nil)
-
 	as := awarding.NewAwardService(ar, ur, er)
-	err := as.ProcessPhishingEvents()
+	awardEvent, err := as.AssignAward(event)
 
 	assert.Nil(t, err)
+	assert.Equal(t, awardEvent.Event.Action, event.Action)
+	assert.Equal(t, awardEvent.Event.UserID, event.UserID)
+	assert.Equal(t, awardEvent.Award.AssignedTo, event.UserID)
+	assert.Equal(t, awardEvent.Award.Type, awards.ReportAward)
 }
 
 func TestProcessPhishingEventsAwardRemoveExisting(t *testing.T) {
@@ -71,8 +71,6 @@ func TestProcessPhishingEventsAwardRemoveExisting(t *testing.T) {
 		EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
 		ProcessedAt: nil,
 	}
-	unproEvents := []awards.UserPhishingEvent{event}
-	er.EXPECT().GetUnprocessed().Times(1).Return(unproEvents, nil)
 	er.EXPECT().ClickedExists(event.UserID, event.EmailRef).Return(false, nil)
 
 	existAward := &awards.PhishingAward{
@@ -91,12 +89,14 @@ func TestProcessPhishingEventsAwardRemoveExisting(t *testing.T) {
 	}
 	ur.EXPECT().Get(event.UserID).Return(user, nil)
 	ar.EXPECT().Delete(existAward.Id).Return(nil)
-	er.EXPECT().MarkAsProcessed(gomock.Any()).Return(nil)
 
 	as := awarding.NewAwardService(ar, ur, er)
-	err := as.ProcessPhishingEvents()
+	awardEvent, err := as.AssignAward(event)
 
 	assert.Nil(t, err)
+	assert.Equal(t, awardEvent.Event.Action, event.Action)
+	assert.Equal(t, awardEvent.Event.UserID, event.UserID)
+	assert.Nil(t, awardEvent.Award)
 }
 
 func TestProcessPhishingEventsAwardAddNew(t *testing.T) {
@@ -114,8 +114,6 @@ func TestProcessPhishingEventsAwardAddNew(t *testing.T) {
 		EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
 		ProcessedAt: nil,
 	}
-	unproEvents := []awards.UserPhishingEvent{event}
-	er.EXPECT().GetUnprocessed().Times(1).Return(unproEvents, nil)
 	er.EXPECT().ClickedExists(event.UserID, event.EmailRef).Return(false, nil)
 	ar.EXPECT().GetByEmailRef(event.UserID, event.EmailRef).Return(nil, nil)
 
@@ -124,11 +122,14 @@ func TestProcessPhishingEventsAwardAddNew(t *testing.T) {
 		CompanyId: awards.CompanyId(1),
 	}
 	ur.EXPECT().Get(event.UserID).Return(user, nil)
-	er.EXPECT().MarkAsProcessed(gomock.Any()).Return(nil)
 	ar.EXPECT().Add(gomock.Any()).Return(nil)
 
 	as := awarding.NewAwardService(ar, ur, er)
-	err := as.ProcessPhishingEvents()
+	awardEvent, err := as.AssignAward(event)
 
 	assert.Nil(t, err)
+	assert.Equal(t, awardEvent.Event.Action, event.Action)
+	assert.Equal(t, awardEvent.Event.UserID, event.UserID)
+	assert.Equal(t, awardEvent.Award.AssignedTo, event.UserID)
+	assert.Equal(t, awardEvent.Award.Type, awards.OpenAward)
 }
