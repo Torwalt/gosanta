@@ -19,7 +19,7 @@ func NewAwardService(
 	return AwardService{awardRepo: awardRepo, userRepo: userRepo, eventRepo: eventRepo}
 }
 
-// Assign or remove awards for the corresponding users based on the UserPhishingEvent.
+// Assign or remove an award for the corresponding user based on the passed UserPhishingEvent.
 func (s *AwardService) AssignAward(event awards.UserPhishingEvent) (usrAwardEvent awards.UserAwardEvent, err error) {
 	usrAwardEvent, err = s.assignPhishingAward(event)
 	if err != nil {

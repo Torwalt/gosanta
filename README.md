@@ -19,7 +19,7 @@ This is test project to explore DDD & Hexagonal design patterns in golang. Inspi
 
 **Not End-to-End tested yet**
 
-The service requires and external queue to connect to (i.e. AWS SQS) it does
+The service requires and external queue to connect to (i.e. AWS SQS) so it does
 not make sense to run it locally. I need to provide a mock implementation of
 ports.EventQueue for that.
 
@@ -51,9 +51,9 @@ Or `Ports & Adapters` is a design pattern in which application code is split
 into domain logic and infrastructure implementations. A domain, here `awards`,
 consists of `PhishingEvent`s being processed to assing `PhishingAward`s to
 `User`s belonging to `Company`s. The orchestration of that domain is done
-through services. Services, e.g. `awarding`, read events from a repository,
-apply the domain logic to them and create (write to another repository) the
-appropriate `PhishingAward`s. These domain services can be interacted with
+through services. A service, e.g. `awarding`, receives a phishing event as input,
+applies the domain logic to it and creates (writes to a repository) the
+appropriate `PhishingAward`. Such a domain service can be interacted with
 through different `ports`, e.g. an HTTP interface or a cron job. The main point
 is, that the domain and domain services are not coupled to infrastructure
 implementing the domain's functionality, e.g. the `AwardService` depends on an
@@ -73,7 +73,7 @@ what the application does, and domain types should mirror business objects.
 1. User sync.
    Ideally, user data would be shared by a user service over events. E.g.
    UserCreated, UserUpdated, etc. Those events could be put into the same queue
-   as the phishing events, and could be processed by the same command.
+   as the phishing events.
 2. Swagger/OpenAPI doc gen.
    Should be put into the pkg directory.
 3. Logging and metrics.
@@ -102,19 +102,7 @@ with, for now, no obvious downsides.
 
 ### Multiple commands
 
-As I am new to golang, I am not sure how much of a best practice it is, to
-provide multiple commands for an application. An alternative could also be to
-just have one command, that spawns goroutines to do the things the commands
-currently do, i.e.
-
-1. HTTP serving.
-2. SQS-Queue reading and persisting of events.
-3. Awarding background task.
-
-Having multiple commands gives us atleast the advantage, to deploy binaries for
-each of the "tasks" of this application separately, and, potentially as
-microservices. E.g., each binary could run as an AWS lambda function (some
-adjustments would need to be done here first).
+Deprecated. Have a look [here](docs/adrs.md).
 
 ### Package and folder naming
 
