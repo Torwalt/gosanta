@@ -4,10 +4,12 @@ import (
 	awards "gosanta/internal"
 	"gosanta/internal/eventbroker"
 	"gosanta/internal/mocks"
+	"os"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/go-kit/log"
 	"github.com/golang/mock/gomock"
 )
 
@@ -19,7 +21,9 @@ func TestStart(t *testing.T) {
 	as := mocks.NewMockAwardAssigner(ctrl)
 	ms := mocks.NewMockMailSender(ctrl)
 	ep := mocks.NewMockEventPublisher(ctrl)
-	an := eventbroker.NewAwarderNotifier(el, as, ms, ep)
+	w := log.NewSyncWriter(os.Stderr)
+	logger := log.NewLogfmtLogger(w)
+	an := eventbroker.NewAwarderNotifier(el, as, ms, ep, log.With(logger, "component", "test-award-notifier"))
 
 	uID := awards.UserId(1)
 	expEvent := awards.UserPhishingEvent{

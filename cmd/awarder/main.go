@@ -76,7 +76,7 @@ func run(logger log.Logger) error {
 	eventPublisher := eventpublishing.New()
 
 	// awarding flow orchestrator
-	awarder := eventbroker.NewAwarderNotifier(&eventLogger, awardSrvc, &usrNotifyer, &eventPublisher)
+	awarder := eventbroker.NewAwarderNotifier(&eventLogger, awardSrvc, &usrNotifyer, &eventPublisher, log.With(logger, "component", "award-notifier"))
 
 	eventChan := make(chan awards.UserPhishingEvent)
 	awardChan := make(chan awards.UserAwardEvent)

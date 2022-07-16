@@ -1,10 +1,12 @@
 package eventbroker
 
 import (
-	"fmt"
 	awards "gosanta/internal"
 	"gosanta/internal/ports"
 	"time"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
 )
 
 // potentially do event persistence here?
@@ -13,16 +15,19 @@ type AwarderNotifier struct {
 	awardService   ports.AwardAssigner
 	mailSender     ports.MailSender
 	eventPublisher ports.EventPublisher
+	logger         log.Logger
 	LogEvents      bool
 }
 
-func NewAwarderNotifier(eventLog ports.EventLogReader, awardService ports.AwardAssigner, mailSender ports.MailSender, eventPublisher ports.EventPublisher) AwarderNotifier {
+func NewAwarderNotifier(eventLog ports.EventLogReader, awardService ports.AwardAssigner,
+	mailSender ports.MailSender, eventPublisher ports.EventPublisher, logger log.Logger) AwarderNotifier {
 	return AwarderNotifier{
 		eventLog:       eventLog,
 		awardService:   awardService,
 		mailSender:     mailSender,
 		eventPublisher: eventPublisher,
 		LogEvents:      true,
+		logger:         logger,
 	}
 }
 
@@ -41,11 +46,9 @@ func (a *AwarderNotifier) Start(eventChan chan awards.UserPhishingEvent, awardCh
 
 func (a *AwarderNotifier) startEventLogging(eventChan chan awards.UserPhishingEvent) {
 	for a.LogEvents {
-		// TODO real logging
-		fmt.Println("LogNewEvents called")
 		events, err := a.eventLog.LogNewEvents()
 		if err != nil {
-			fmt.Printf("error when retrieving events: %v", err)
+			level.Error(a.logger).Log("error", err)
 			time.Sleep(30 * time.Second)
 			continue
 		}
@@ -57,9 +60,9 @@ func (a *AwarderNotifier) startEventLogging(eventChan chan awards.UserPhishingEv
 
 func (a *AwarderNotifier) startAwardAssigning(inChan chan awards.UserPhishingEvent, outChan chan awards.UserAwardEvent) {
 	for event := range inChan {
-		fmt.Println("AssignAward called")
 		awardEvnt, err := a.awardService.AssignAward(event)
 		if err != nil {
+			level.Error(a.logger).Log("error", err)
 			continue
 		}
 		outChan <- awardEvnt
@@ -69,16 +72,14 @@ func (a *AwarderNotifier) startAwardAssigning(inChan chan awards.UserPhishingEve
 func (a *AwarderNotifier) startNotifying(eventChan chan awards.UserAwardEvent) {
 	// SendToUser and PublishEvent can also be made concurrent, for now synchronious
 	for awardEvnt := range eventChan {
-		fmt.Println("SendToUser called")
 		err := a.mailSender.SendToUser(awardEvnt)
 		if err != nil {
-			// TODO
+			level.Error(a.logger).Log("error", err)
 			continue
 		}
-		fmt.Println("PublishEvent called")
 		err = a.eventPublisher.PublishEvent(awardEvnt)
 		if err != nil {
-			// TODO
+			level.Error(a.logger).Log("error", err)
 			continue
 		}
 	}
