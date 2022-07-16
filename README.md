@@ -12,10 +12,18 @@ This is test project to explore DDD & Hexagonal design patterns in golang. Inspi
 
 ## Init
 
-- `cp example.env .env`
-- fill out missing env vars
-- `make run-docker-composed`
-- `make init-db`
+- create env file from example env
+  - `cp example.env .env`
+  - fill out missing env vars
+- export env, e.g.:
+  - `export $(cat .env | xargs)` or
+  - `set -o allexport source .env set +o allexport`
+- install tools and dependencies
+  - `make install-tools`
+- build and run containers
+  - `make run-docker-composed`
+- create db schema
+  - `make init-db`
 
 **Not End-to-End tested yet**
 
@@ -26,9 +34,9 @@ ports.EventQueue for that.
 ## Running Tests
 
 - db connection with docker needed before running tests
-- `make test`
+  - `make`
 - for coverage report
-- `make test-cov`
+  - `make test-cov`
 
 ## Domain
 

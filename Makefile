@@ -1,5 +1,14 @@
 BINARY_NAME=awardservice
 
+default: test
+
+download:
+	@echo Download go.mod dependencies
+	@go mod download
+
+install-tools: download
+	@echo Installing tools from tools.go
+	@go list -f '{{range .Imports}}{{.}} {{end}}' tools.go | xargs go install
 
 build:
 	go build -o ./bin/${BINARY_NAME} ./cmd/awarder/main.go
@@ -33,7 +42,7 @@ clean:
 	rm ./bin/${BINARY_NAME}
 
 test:
-	go test ./... -v -short
+	gotestsum --format testname
 
 test-cov:
 	go test ./... -v -short -coverprofile cover.out && \
