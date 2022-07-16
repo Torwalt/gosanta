@@ -17,14 +17,17 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
-	github.com/fatih/color v1.10.0 // indirect
+	github.com/fatih/color v1.12.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/go-kit/kit v0.12.0 // indirect
+	github.com/go-kit/log v0.2.0 // indirect
+	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect

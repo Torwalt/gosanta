@@ -8,27 +8,35 @@ import (
 	"gosanta/internal/eventbroker"
 	"gosanta/internal/eventlogging"
 	"gosanta/internal/eventpublishing"
+	"gosanta/internal/ports"
 	"gosanta/internal/postgres"
 	"gosanta/internal/ranking"
 	"gosanta/internal/rest"
 	"gosanta/internal/usernotifying"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/go-kit/kit/log"
 )
 
 func main() {
 	fmt.Print("Starting awarding job.")
-	err := run()
+
+	// logging
+	w := log.NewSyncWriter(os.Stderr)
+	logger := log.NewLogfmtLogger(w)
+
+	err := run(logger)
+
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		logger.Log("error", err)
+		os.Exit(1)
 	}
 }
 
-func run() error {
+func run(logger log.Logger) error {
 	config := loadFromEnv()
 
 	// repositories
@@ -49,17 +57,26 @@ func run() error {
 	s := sqs.New(sess)
 	client := awssqs.New(s, config.queueURL)
 
-	// services
-	awardSrvc := awarding.NewAwardService(ar, ur, per)
+	// awarding service
+	var awardSrvc ports.AwardAssigner
+	awardSrvc = awarding.NewAwardService(ar, ur, per)
+	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "awarding"), awardSrvc)
+
+	// event retrieval and persistence service
 	eventLogger := eventlogging.New(per, &client)
+
+	// award ranking and retrieval service
 	rankingSrvc := ranking.NewService(ar, ur)
+
+	// rest server
 	restSrv := rest.New(&rankingSrvc)
 
 	// stubs for now
 	usrNotifyer := usernotifying.New()
 	eventPublisher := eventpublishing.New()
 
-	awarder := eventbroker.NewAwarderNotifier(&eventLogger, &awardSrvc, &usrNotifyer, &eventPublisher)
+	// awarding flow orchestrator
+	awarder := eventbroker.NewAwarderNotifier(&eventLogger, awardSrvc, &usrNotifyer, &eventPublisher)
 
 	eventChan := make(chan awards.UserPhishingEvent)
 	awardChan := make(chan awards.UserAwardEvent)

@@ -15,8 +15,8 @@ func NewAwardService(
 	awardRepo ports.AwardRepository,
 	userRepo ports.UserReadRepository,
 	eventRepo ports.EventRepositoryProcessor,
-) AwardService {
-	return AwardService{awardRepo: awardRepo, userRepo: userRepo, eventRepo: eventRepo}
+) *AwardService {
+	return &AwardService{awardRepo: awardRepo, userRepo: userRepo, eventRepo: eventRepo}
 }
 
 // Assign or remove an award for the corresponding user based on the passed UserPhishingEvent.

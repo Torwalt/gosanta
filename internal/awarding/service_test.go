@@ -4,9 +4,12 @@ import (
 	awards "gosanta/internal"
 	"gosanta/internal/awarding"
 	"gosanta/internal/mocks"
+	"gosanta/internal/ports"
+	"os"
 	"testing"
 	"time"
 
+	"github.com/go-kit/log"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -46,8 +49,13 @@ func TestAssignAwardAwardUpdated(t *testing.T) {
 	ar.EXPECT().UpdateExisting(existAward, gomock.Any()).Return(nil)
 	ar.EXPECT().Add(gomock.Any()).Times(0)
 
-	as := awarding.NewAwardService(ar, ur, er)
-	awardEvent, err := as.AssignAward(event)
+	w := log.NewSyncWriter(os.Stderr)
+	logger := log.NewLogfmtLogger(w)
+
+	var awardSrvc ports.AwardAssigner
+	awardSrvc = awarding.NewAwardService(ar, ur, er)
+	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "test-awarding"), awardSrvc)
+	awardEvent, err := awardSrvc.AssignAward(event)
 
 	assert.Nil(t, err)
 	assert.Equal(t, awardEvent.Event.Action, event.Action)
@@ -90,8 +98,13 @@ func TestProcessPhishingEventsAwardRemoveExisting(t *testing.T) {
 	ur.EXPECT().Get(event.UserID).Return(user, nil)
 	ar.EXPECT().Delete(existAward.Id).Return(nil)
 
-	as := awarding.NewAwardService(ar, ur, er)
-	awardEvent, err := as.AssignAward(event)
+	w := log.NewSyncWriter(os.Stderr)
+	logger := log.NewLogfmtLogger(w)
+
+	var awardSrvc ports.AwardAssigner
+	awardSrvc = awarding.NewAwardService(ar, ur, er)
+	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "test-awarding"), awardSrvc)
+	awardEvent, err := awardSrvc.AssignAward(event)
 
 	assert.Nil(t, err)
 	assert.Equal(t, awardEvent.Event.Action, event.Action)
@@ -124,8 +137,13 @@ func TestProcessPhishingEventsAwardAddNew(t *testing.T) {
 	ur.EXPECT().Get(event.UserID).Return(user, nil)
 	ar.EXPECT().Add(gomock.Any()).Return(nil)
 
-	as := awarding.NewAwardService(ar, ur, er)
-	awardEvent, err := as.AssignAward(event)
+	w := log.NewSyncWriter(os.Stderr)
+	logger := log.NewLogfmtLogger(w)
+
+	var awardSrvc ports.AwardAssigner
+	awardSrvc = awarding.NewAwardService(ar, ur, er)
+	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "test-awarding"), awardSrvc)
+	awardEvent, err := awardSrvc.AssignAward(event)
 
 	assert.Nil(t, err)
 	assert.Equal(t, awardEvent.Event.Action, event.Action)
@@ -133,3 +151,4 @@ func TestProcessPhishingEventsAwardAddNew(t *testing.T) {
 	assert.Equal(t, awardEvent.Award.AssignedTo, event.UserID)
 	assert.Equal(t, awardEvent.Award.Type, awards.OpenAward)
 }
+

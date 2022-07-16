@@ -1,6 +1,7 @@
 package awards
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -74,6 +75,11 @@ type UserPhishingEvent struct {
 	CreatedAt   time.Time
 	EmailRef    string
 	ProcessedAt *time.Time
+}
+
+func (e UserPhishingEvent) String() string {
+	return fmt.Sprintf("UserPhishingEvent -> ID: %v, UserID: %v, Action: %v, CreatedAt: %v, EmailRef: %v",
+					e.ID, e.UserID, e.Action, e.CreatedAt, e.EmailRef)
 }
 
 // A user receiving and/or loosing an award.
