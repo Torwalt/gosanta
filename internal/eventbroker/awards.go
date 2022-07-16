@@ -1,6 +1,7 @@
 package eventbroker
 
 import (
+	"fmt"
 	awards "gosanta/internal"
 	"gosanta/internal/ports"
 	"time"
@@ -16,11 +17,15 @@ type AwarderNotifier struct {
 	mailSender     ports.MailSender
 	eventPublisher ports.EventPublisher
 	logger         log.Logger
+	eventChan      chan awards.UserPhishingEvent
+	awardChan      chan awards.UserAwardEvent
 	LogEvents      bool
 }
 
 func NewAwarderNotifier(eventLog ports.EventLogReader, awardService ports.AwardAssigner,
-	mailSender ports.MailSender, eventPublisher ports.EventPublisher, logger log.Logger) AwarderNotifier {
+	mailSender ports.MailSender, eventPublisher ports.EventPublisher, logger log.Logger,
+	eventChan chan awards.UserPhishingEvent, awardChan chan awards.UserAwardEvent,
+) AwarderNotifier {
 	return AwarderNotifier{
 		eventLog:       eventLog,
 		awardService:   awardService,
@@ -28,24 +33,27 @@ func NewAwarderNotifier(eventLog ports.EventLogReader, awardService ports.AwardA
 		eventPublisher: eventPublisher,
 		LogEvents:      true,
 		logger:         logger,
+		eventChan:      eventChan,
+		awardChan:      awardChan,
 	}
 }
 
 // Start the AwardNotifier.
 // Concurrently run event retrieval/persitence, award assignment and user/system notification.
-func (a *AwarderNotifier) Start(eventChan chan awards.UserPhishingEvent, awardChan chan awards.UserAwardEvent) {
+func (a *AwarderNotifier) Start() {
 	// poll and persist events
-	go a.startEventLogging(eventChan)
+	go a.startEventLogging(a.eventChan)
 
 	// process event and apply award assignment logic
-	go a.startAwardAssigning(eventChan, awardChan)
+	go a.startAwardAssigning(a.eventChan, a.awardChan)
 
 	// apply logic in sending email to user and publish award event
-	go a.startNotifying(awardChan)
+	go a.startNotifying(a.awardChan)
 }
 
 func (a *AwarderNotifier) startEventLogging(eventChan chan awards.UserPhishingEvent) {
 	for a.LogEvents {
+		// we should additionally retrieve events that were not processed due to process dying
 		events, err := a.eventLog.LogNewEvents()
 		if err != nil {
 			level.Error(a.logger).Log("error", err)
@@ -62,7 +70,8 @@ func (a *AwarderNotifier) startAwardAssigning(inChan chan awards.UserPhishingEve
 	for event := range inChan {
 		awardEvnt, err := a.awardService.AssignAward(event)
 		if err != nil {
-			level.Error(a.logger).Log("error", err)
+			level.Error(a.logger).Log("error", err, "usecase", "awarding")
+			a.scheduleAwardRetry(time.Now().UTC().Add(time.Second*60), event)
 			continue
 		}
 		outChan <- awardEvnt
@@ -72,6 +81,8 @@ func (a *AwarderNotifier) startAwardAssigning(inChan chan awards.UserPhishingEve
 func (a *AwarderNotifier) startNotifying(eventChan chan awards.UserAwardEvent) {
 	// SendToUser and PublishEvent can also be made concurrent, for now synchronious
 	for awardEvnt := range eventChan {
+		// retrying would be implemented by the infrastructure component of the usecase
+		// business logic would dictate, if event should be published first, or email to user
 		err := a.mailSender.SendToUser(awardEvnt)
 		if err != nil {
 			level.Error(a.logger).Log("error", err)
@@ -83,4 +94,24 @@ func (a *AwarderNotifier) startNotifying(eventChan chan awards.UserAwardEvent) {
 			continue
 		}
 	}
+}
+
+// downside: when process dies then the retry is lost
+func (a *AwarderNotifier) scheduleAwardRetry(retryAt time.Time, event awards.UserPhishingEvent) {
+	now := time.Now().UTC()
+	waitTime := retryAt.Sub(now)
+
+	msg := fmt.Sprintf("retrying in %v seconds", waitTime)
+	level.Info(a.logger).Log("usecase", "awarding", "message", msg)
+
+	f := func() {
+		a.eventChan <- event
+	}
+
+	go a.retryIn(waitTime, f)
+}
+
+func (a *AwarderNotifier) retryIn(s time.Duration, f func()) {
+	time.Sleep(s)
+	f()
 }

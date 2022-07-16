@@ -32,19 +32,16 @@ func (s *AwardService) assignPhishingAward(event awards.UserPhishingEvent) (awar
 	userAward := awards.UserAwardEvent{Event: event}
 	clickedExists, err := s.eventRepo.ClickedExists(event.UserID, event.EmailRef)
 	if err != nil {
-		// TODO
 		return userAward, err
 	}
 
 	existingAward, err := s.awardRepo.GetByEmailRef(event.UserID, event.EmailRef)
 	if err != nil {
-		// TODO
 		return userAward, err
 	}
 
 	user, err := s.userRepo.Get(event.UserID)
 	if err != nil {
-		// TODO
 		return userAward, err
 	}
 
@@ -62,7 +59,6 @@ func (s *AwardService) assignPhishingAward(event awards.UserPhishingEvent) (awar
 
 	newAward, err := awards.New(*user, event, clickedExists, existingAward)
 	if err != nil {
-		// TODO
 		return userAward, err
 	}
 
@@ -74,6 +70,12 @@ func (s *AwardService) assignPhishingAward(event awards.UserPhishingEvent) (awar
 		return userAward, err
 	}
 
+	// TODO: adding award and marking event as processed must be in a transaction
 	err = s.awardRepo.Add(newAward)
+	if err != nil {
+		return userAward, err
+	}
+
+	err = s.eventRepo.MarkAsProcessed(&event)
 	return userAward, err
 }

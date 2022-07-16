@@ -129,6 +129,7 @@ func TestProcessPhishingEventsAwardAddNew(t *testing.T) {
 	}
 	er.EXPECT().ClickedExists(event.UserID, event.EmailRef).Return(false, nil)
 	ar.EXPECT().GetByEmailRef(event.UserID, event.EmailRef).Return(nil, nil)
+	er.EXPECT().MarkAsProcessed(&event).Return(nil)
 
 	user := &awards.User{
 		Id:        user_1,

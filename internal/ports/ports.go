@@ -66,3 +66,4 @@ type EventLogReader interface {
 type AwardAssigner interface {
 	AssignAward(event awards.UserPhishingEvent) (awards.UserAwardEvent, error)
 }
+

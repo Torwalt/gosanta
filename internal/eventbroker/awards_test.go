@@ -23,7 +23,11 @@ func TestStart(t *testing.T) {
 	ep := mocks.NewMockEventPublisher(ctrl)
 	w := log.NewSyncWriter(os.Stderr)
 	logger := log.NewLogfmtLogger(w)
-	an := eventbroker.NewAwarderNotifier(el, as, ms, ep, log.With(logger, "component", "test-award-notifier"))
+	eventChan := make(chan awards.UserPhishingEvent)
+	awardChan := make(chan awards.UserAwardEvent)
+
+	an := eventbroker.NewAwarderNotifier(el, as, ms, ep,
+		log.With(logger, "component", "test-award-notifier"), eventChan, awardChan)
 
 	uID := awards.UserId(1)
 	expEvent := awards.UserPhishingEvent{
@@ -73,9 +77,6 @@ func TestStart(t *testing.T) {
 		defer wg.Done()
 	}).AnyTimes()
 
-	eventChan := make(chan awards.UserPhishingEvent)
-	awardChan := make(chan awards.UserAwardEvent)
-
-	an.Start(eventChan, awardChan)
+	an.Start()
 	wg.Wait()
 }
