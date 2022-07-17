@@ -51,11 +51,11 @@ func (a AwardType) Points() int {
 
 // An award assigned for correctly interacting with a pyphish phishing email.
 type PhishingAward struct {
-	Id         int64
-	AssignedTo UserId
-	EarnedOn   time.Time
-	Type       AwardType
-	EmailRef   string
+	Id           int64
+	AssignedTo   UserId
+	EarnedOn     time.Time
+	Type         AwardType
+	EmailRef     string
 }
 
 // A PhishingAward cannot be upgraded or removed, if it was assigned and stayed
@@ -107,7 +107,7 @@ func New(
 				"action %v is not eligible for award: email was already ignored", event.Action)}
 		}
 		if isDuplicate(*existingAward, typ) == true {
-			return nil, &Error{Code: NoAward, Err: fmt.Errorf(
+			return nil, &Error{Code: DuplicateError, Err: fmt.Errorf(
 				"action %v is not eligible for award: award already earned", event.Action)}
 		}
 		// e.g. if ReportedAward was earned and OpenedEvent comes in.

@@ -177,7 +177,7 @@ func TestNew(t *testing.T) {
 				Type:       awards.OpenAward,
 				EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 			},
-			ExpectedError: &awards.Error{Code: awards.NoAward, Err: fmt.Errorf(
+			ExpectedError: &awards.Error{Code: awards.DuplicateError, Err: fmt.Errorf(
 				"action %v is not eligible for award: award already earned", awards.Opened)},
 			ExpectedAward: nil,
 		},

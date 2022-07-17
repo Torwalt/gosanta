@@ -1,6 +1,7 @@
 package awarding_test
 
 import (
+	"fmt"
 	awards "gosanta/internal"
 	"gosanta/internal/awarding"
 	"gosanta/internal/mocks"
@@ -39,6 +40,7 @@ func TestAssignAwardAwardUpdated(t *testing.T) {
 		EmailRef:   "f20416ef-15d5-4159-9bef-de150edfa970",
 	}
 	ar.EXPECT().GetByEmailRef(event.UserID, event.EmailRef).Return(existAward, nil)
+	er.EXPECT().MarkAsProcessed(&event).Return(nil)
 
 	user := &awards.User{
 		Id:        user_1,
@@ -80,6 +82,7 @@ func TestProcessPhishingEventsAwardRemoveExisting(t *testing.T) {
 		ProcessedAt: nil,
 	}
 	er.EXPECT().ClickedExists(event.UserID, event.EmailRef).Return(false, nil)
+	er.EXPECT().MarkAsProcessed(&event).Return(nil)
 
 	existAward := &awards.PhishingAward{
 		Id:         int64(1),
@@ -153,3 +156,52 @@ func TestProcessPhishingEventsAwardAddNew(t *testing.T) {
 	assert.Equal(t, awardEvent.Award.Type, awards.OpenAward)
 }
 
+// When an award was processed successfully, but MarkAsProcessed returned an error the first time.
+// The award is not changed but the event is marked as processed eventually.
+func TestProcessPhishingEventsAwardEventuallyMarkAsProcessed(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	ar := mocks.NewMockAwardRepository(ctrl)
+	ur := mocks.NewMockUserReadRepository(ctrl)
+	er := mocks.NewMockEventRepositoryProcessor(ctrl)
+	user_1 := awards.UserId(1)
+
+	event := awards.UserPhishingEvent{
+		ID:          1,
+		UserID:      user_1,
+		Action:      awards.Opened,
+		CreatedAt:   time.Now().Add(time.Duration(-100)),
+		EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
+		ProcessedAt: nil,
+	}
+	er.EXPECT().ClickedExists(event.UserID, event.EmailRef).Return(false, nil)
+	ar.EXPECT().GetByEmailRef(event.UserID, event.EmailRef).Return(nil, nil)
+
+	er.EXPECT().MarkAsProcessed(&event).Return(fmt.Errorf("some error"))
+
+	user := &awards.User{
+		Id:        user_1,
+		CompanyId: awards.CompanyId(1),
+	}
+	ur.EXPECT().Get(event.UserID).Return(user, nil)
+	// award is added here
+	ar.EXPECT().Add(gomock.Any()).Return(nil)
+
+	w := log.NewSyncWriter(os.Stderr)
+	logger := log.NewLogfmtLogger(w)
+
+	var awardSrvc ports.AwardAssigner
+	awardSrvc = awarding.NewAwardService(ar, ur, er)
+	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "test-awarding"), awardSrvc)
+	newAward, err := awardSrvc.AssignAward(event)
+
+	assert.NotNil(t, err)
+
+	// second call: ar.Add is not called, as there is a duplicate already
+	er.EXPECT().ClickedExists(event.UserID, event.EmailRef).Return(false, nil)
+	ar.EXPECT().GetByEmailRef(event.UserID, event.EmailRef).Return(newAward.Award, nil)
+	er.EXPECT().MarkAsProcessed(&event).Return(nil)
+	ur.EXPECT().Get(event.UserID).Return(user, nil)
+	_, err = awardSrvc.AssignAward(event)
+
+	assert.Nil(t, err)
+}

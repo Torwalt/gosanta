@@ -52,8 +52,8 @@ func (a *AwarderNotifier) Start() {
 }
 
 func (a *AwarderNotifier) startEventLogging(eventChan chan awards.UserPhishingEvent) {
+	// we should additionally retrieve events that were not processed due to process dying
 	for a.LogEvents {
-		// we should additionally retrieve events that were not processed due to process dying
 		events, err := a.eventLog.LogNewEvents()
 		if err != nil {
 			level.Error(a.logger).Log("error", err)
