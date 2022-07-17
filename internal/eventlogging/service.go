@@ -62,3 +62,8 @@ func (e *EventLogger) LogNewEvents() ([]awards.UserPhishingEvent, error) {
 	}
 	return events, nil
 }
+
+// Retrieve not yet processed UserPhishingEvents.
+func (e *EventLogger) GetUnprocessedEvents() ([]awards.UserPhishingEvent, error) {
+	return e.eventRepo.GetUnprocessed()
+}

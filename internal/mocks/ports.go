@@ -647,6 +647,21 @@ func (m *MockEventLogReader) EXPECT() *MockEventLogReaderMockRecorder {
 	return m.recorder
 }
 
+// GetUnprocessedEvents mocks base method.
+func (m *MockEventLogReader) GetUnprocessedEvents() ([]awards.UserPhishingEvent, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUnprocessedEvents")
+	ret0, _ := ret[0].([]awards.UserPhishingEvent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUnprocessedEvents indicates an expected call of GetUnprocessedEvents.
+func (mr *MockEventLogReaderMockRecorder) GetUnprocessedEvents() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUnprocessedEvents", reflect.TypeOf((*MockEventLogReader)(nil).GetUnprocessedEvents))
+}
+
 // LogNewEvents mocks base method.
 func (m *MockEventLogReader) LogNewEvents() ([]awards.UserPhishingEvent, error) {
 	m.ctrl.T.Helper()

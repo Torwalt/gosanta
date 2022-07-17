@@ -82,10 +82,12 @@ func run(logger log.Logger) error {
 		log.With(logger, "component", "award-notifier"), eventChan, awardChan,
 	)
 
-	awarder.Start()
+	err := awarder.Start()
+	if err != nil {
+		return fmt.Errorf("could not start awarder: %v", err)
+	}
 
-	err := http.ListenAndServe(":"+config.http_port, &restSrv)
-
+	err = http.ListenAndServe(":"+config.http_port, &restSrv)
 	if err != nil {
 		return fmt.Errorf("could not start server: %v", err)
 	}

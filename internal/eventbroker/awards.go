@@ -40,19 +40,40 @@ func NewAwarderNotifier(eventLog ports.EventLogReader, awardService ports.AwardA
 
 // Start the AwardNotifier.
 // Concurrently run event retrieval/persitence, award assignment and user/system notification.
-func (a *AwarderNotifier) Start() {
-	// poll and persist events
-	go a.startEventLogging(a.eventChan)
-
+func (a *AwarderNotifier) Start() error {
 	// process event and apply award assignment logic
 	go a.startAwardAssigning(a.eventChan, a.awardChan)
 
 	// apply logic in sending email to user and publish award event
 	go a.startNotifying(a.awardChan)
+
+	// On startup, first process unprocessed events once. That guarantees that
+	// scheduled retries lost due to program shutdown are still processed.
+	// Scheduled time is not considered.
+	err := a.processUnprocessedEvents(a.eventChan)
+	if err != nil {
+		return fmt.Errorf("could not process unprocessed events: %v", err)
+	}
+
+	// poll and persist events
+	go a.startEventLogging(a.eventChan)
+
+	return nil
+}
+
+func (a *AwarderNotifier) processUnprocessedEvents(eventChan chan awards.UserPhishingEvent) error {
+	events, err := a.eventLog.GetUnprocessedEvents()
+	if err != nil {
+		return err
+	}
+
+	for _, event := range events {
+		eventChan <- event
+	}
+	return nil
 }
 
 func (a *AwarderNotifier) startEventLogging(eventChan chan awards.UserPhishingEvent) {
-	// we should additionally retrieve events that were not processed due to process dying
 	for a.LogEvents {
 		events, err := a.eventLog.LogNewEvents()
 		if err != nil {
@@ -96,7 +117,8 @@ func (a *AwarderNotifier) startNotifying(eventChan chan awards.UserAwardEvent) {
 	}
 }
 
-// downside: when process dies then the retry is lost
+// Schedule a retry for processing a UserPhishingEvent. Retries are kept in
+// memory and are lost on program shutdown.
 func (a *AwarderNotifier) scheduleAwardRetry(retryAt time.Time, event awards.UserPhishingEvent) {
 	now := time.Now().UTC()
 	waitTime := retryAt.Sub(now)

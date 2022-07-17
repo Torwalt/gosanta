@@ -61,9 +61,9 @@ type EventPublisher interface {
 
 type EventLogReader interface {
 	LogNewEvents() ([]awards.UserPhishingEvent, error)
+	GetUnprocessedEvents() ([]awards.UserPhishingEvent, error)
 }
 
 type AwardAssigner interface {
 	AssignAward(event awards.UserPhishingEvent) (awards.UserAwardEvent, error)
 }
-
