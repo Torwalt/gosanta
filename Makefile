@@ -2,27 +2,12 @@ BINARY_NAME=awardservice
 
 default: test
 
-download:
-	@echo Download go.mod dependencies
-	@go mod download
-
 install-tools: download
 	@echo Installing tools from tools.go
 	@go list -f '{{range .Imports}}{{.}} {{end}}' tools.go | xargs go install
 
 build:
 	go build -o ./bin/${BINARY_NAME} ./cmd/awarder/main.go
-
-build-docker:
-	sudo docker build \
-		--build-arg HTTP_PORT=${HTTP_PORT} \
-		--build-arg BINARY_NAME=${BINARY_NAME} . -t ${BINARY_NAME}
-
-run-docker:
-	sudo docker run -p ${HTTP_PORT}:${HTTP_PORT} ${BINARY_NAME}
-
-run-dockerd:
-	sudo docker run -p ${HTTP_PORT}:${HTTP_PORT} -d ${BINARY_NAME}
 
 run-docker-compose:
 	sudo docker-compose up --build
