@@ -88,7 +88,10 @@ func (a *AwarderNotifier) startEventLogging(eventChan chan awards.UserPhishingEv
 	}
 }
 
-func (a *AwarderNotifier) startAwardAssigning(inChan chan awards.UserPhishingEvent, outChan chan awards.UserAwardEvent) {
+func (a *AwarderNotifier) startAwardAssigning(
+	inChan chan awards.UserPhishingEvent,
+	outChan chan awards.UserAwardEvent,
+) {
 	for event := range inChan {
 		awardEvnt, err := a.awardService.AssignAward(event)
 		if err != nil {

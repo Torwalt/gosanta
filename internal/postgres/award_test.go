@@ -32,7 +32,12 @@ func getDb(t *testing.T) *bun.DB {
 }
 
 func resetDb(t *testing.T, db *bun.DB, ctx context.Context) {
-	err := db.ResetModel(ctx, (*postgres.DBAward)(nil), (*postgres.DBUser)(nil), (*postgres.DBPhishingEvent)(nil))
+	err := db.ResetModel(
+		ctx,
+		(*postgres.DBAward)(nil),
+		(*postgres.DBUser)(nil),
+		(*postgres.DBPhishingEvent)(nil),
+	)
 	if err != nil {
 		t.Errorf("could not reset DB: %v", err)
 	}

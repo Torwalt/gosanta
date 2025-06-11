@@ -57,7 +57,10 @@ func TestAssignAwardAwardUpdated(t *testing.T) {
 
 	var awardSrvc ports.AwardAssigner
 	awardSrvc = awarding.NewAwardService(ar, ur, er)
-	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "test-awarding"), awardSrvc)
+	awardSrvc = awarding.NewLoggingService(
+		log.With(logger, "component", "test-awarding"),
+		awardSrvc,
+	)
 	awardEvent, err := awardSrvc.AssignAward(event)
 
 	assert.Nil(t, err)
@@ -107,7 +110,10 @@ func TestProcessPhishingEventsAwardRemoveExisting(t *testing.T) {
 
 	var awardSrvc ports.AwardAssigner
 	awardSrvc = awarding.NewAwardService(ar, ur, er)
-	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "test-awarding"), awardSrvc)
+	awardSrvc = awarding.NewLoggingService(
+		log.With(logger, "component", "test-awarding"),
+		awardSrvc,
+	)
 	awardEvent, err := awardSrvc.AssignAward(event)
 
 	assert.Nil(t, err)
@@ -147,7 +153,10 @@ func TestProcessPhishingEventsAwardAddNew(t *testing.T) {
 
 	var awardSrvc ports.AwardAssigner
 	awardSrvc = awarding.NewAwardService(ar, ur, er)
-	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "test-awarding"), awardSrvc)
+	awardSrvc = awarding.NewLoggingService(
+		log.With(logger, "component", "test-awarding"),
+		awardSrvc,
+	)
 	awardEvent, err := awardSrvc.AssignAward(event)
 
 	assert.Nil(t, err)
@@ -192,7 +201,10 @@ func TestProcessPhishingEventsAwardEventuallyMarkAsProcessed(t *testing.T) {
 
 	var awardSrvc ports.AwardAssigner
 	awardSrvc = awarding.NewAwardService(ar, ur, er)
-	awardSrvc = awarding.NewLoggingService(log.With(logger, "component", "test-awarding"), awardSrvc)
+	awardSrvc = awarding.NewLoggingService(
+		log.With(logger, "component", "test-awarding"),
+		awardSrvc,
+	)
 	newAward, err := awardSrvc.AssignAward(event)
 
 	assert.NotNil(t, err)

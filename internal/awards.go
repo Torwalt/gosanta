@@ -126,7 +126,8 @@ func New(
 }
 
 func isUpgradable(existingAward PhishingAward, action PhishingAction) bool {
-	if existingAward.Type == OpenAward && existingAward.IsProtected() == false && action == Reported {
+	if existingAward.Type == OpenAward && existingAward.IsProtected() == false &&
+		action == Reported {
 		return true
 	}
 	return false

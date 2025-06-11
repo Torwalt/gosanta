@@ -5,9 +5,10 @@
 package mocks
 
 import (
+	reflect "reflect"
+
 	awards "gosanta/internal"
 	events "gosanta/pkg"
-	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
 )

@@ -10,7 +10,10 @@ type RankingService struct {
 	userRepo  ports.UserReadRepository
 }
 
-func NewService(awardRepo ports.AwardReadRepository, userRepo ports.UserReadRepository) RankingService {
+func NewService(
+	awardRepo ports.AwardReadRepository,
+	userRepo ports.UserReadRepository,
+) RankingService {
 	return RankingService{awardRepo: awardRepo, userRepo: userRepo}
 }
 

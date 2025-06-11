@@ -19,7 +19,9 @@ func NewLoggingService(logger log.Logger, s ports.AwardAssigner) ports.AwardAssi
 	return &loggingService{logger, s}
 }
 
-func (s *loggingService) AssignAward(event awards.UserPhishingEvent) (usrAwardEvent awards.UserAwardEvent, err error) {
+func (s *loggingService) AssignAward(
+	event awards.UserPhishingEvent,
+) (usrAwardEvent awards.UserAwardEvent, err error) {
 	defer func(begin time.Time) {
 		s.logger.Log(
 			"method", "assign_award",

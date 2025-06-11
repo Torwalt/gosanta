@@ -22,7 +22,9 @@ func NewAwardService(
 }
 
 // Assign or remove an award for the corresponding user based on the passed UserPhishingEvent.
-func (s *AwardService) AssignAward(event awards.UserPhishingEvent) (usrAwardEvent awards.UserAwardEvent, err error) {
+func (s *AwardService) AssignAward(
+	event awards.UserPhishingEvent,
+) (usrAwardEvent awards.UserAwardEvent, err error) {
 	usrAwardEvent, err = s.assignPhishingAward(event)
 
 	var awardErr *awards.Error
@@ -40,7 +42,9 @@ func (s *AwardService) AssignAward(event awards.UserPhishingEvent) (usrAwardEven
 	return usrAwardEvent, err
 }
 
-func (s *AwardService) assignPhishingAward(event awards.UserPhishingEvent) (awards.UserAwardEvent, error) {
+func (s *AwardService) assignPhishingAward(
+	event awards.UserPhishingEvent,
+) (awards.UserAwardEvent, error) {
 	userAward := awards.UserAwardEvent{Event: event}
 	clickedExists, err := s.eventRepo.ClickedExists(event.UserID, event.EmailRef)
 	if err != nil {

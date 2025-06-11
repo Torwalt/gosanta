@@ -83,7 +83,10 @@ func TestGetUserAwardsErrors(t *testing.T) {
 			StatusCode:   http.StatusNotFound,
 			ActualUserId: awards.UserId(1),
 			ServiceCall:  true,
-			ServiceError: &awards.Error{Code: awards.DoesNotExistError, Err: fmt.Errorf("Test error")},
+			ServiceError: &awards.Error{
+				Code: awards.DoesNotExistError,
+				Err:  fmt.Errorf("Test error"),
+			},
 		},
 		{
 			Name:         "unexpected error",

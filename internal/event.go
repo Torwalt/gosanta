@@ -78,8 +78,14 @@ type UserPhishingEvent struct {
 }
 
 func (e UserPhishingEvent) String() string {
-	return fmt.Sprintf("UserPhishingEvent -> ID: %v, UserID: %v, Action: %v, CreatedAt: %v, EmailRef: %v",
-		e.ID, e.UserID, e.Action, e.CreatedAt, e.EmailRef)
+	return fmt.Sprintf(
+		"UserPhishingEvent -> ID: %v, UserID: %v, Action: %v, CreatedAt: %v, EmailRef: %v",
+		e.ID,
+		e.UserID,
+		e.Action,
+		e.CreatedAt,
+		e.EmailRef,
+	)
 }
 
 // A user receiving and/or loosing an award.

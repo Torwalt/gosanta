@@ -52,7 +52,11 @@ func (ar *userRepository) GetCompanyUsers(cId awards.CompanyId) ([]awards.User, 
 	var users []awards.User
 
 	ctx := context.Background()
-	err := ar.db.NewSelect().Model(&dbUsers).Relation("Awards").Where("company_id = ?", cId).Scan(ctx)
+	err := ar.db.NewSelect().
+		Model(&dbUsers).
+		Relation("Awards").
+		Where("company_id = ?", cId).
+		Scan(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return users, &awards.Error{
