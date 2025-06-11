@@ -1,11 +1,12 @@
 package awssqs_test
 
 import (
+	"testing"
+	"time"
+
 	"gosanta/internal/awssqs"
 	"gosanta/internal/mocks"
 	events "gosanta/pkg"
-	"testing"
-	"time"
 
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/golang/mock/gomock"
@@ -34,11 +35,11 @@ func TestGetNextMessages(t *testing.T) {
 
 	expEvents := []events.PhishingEvent{
 		{
-			UserId: 1,
-			CreatedAt: time.Date(2022, 3,  28, 14, 41, 34, 0, time.UTC),
-			Action: "opened",
-			EmailRef: "f20416ef-15d5-4159-9bef-de150edfa970",
-			EventId: expMsgID,
+			UserId:    1,
+			CreatedAt: time.Date(2022, 3, 28, 14, 41, 34, 0, time.UTC),
+			Action:    "opened",
+			EmailRef:  "f20416ef-15d5-4159-9bef-de150edfa970",
+			EventId:   expMsgID,
 		},
 	}
 

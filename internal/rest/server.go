@@ -3,9 +3,10 @@ package rest
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+
 	awards "gosanta/internal"
 	"gosanta/internal/ports"
-	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -34,7 +35,6 @@ func New(awardService ports.AwardReadingService) Server {
 	s.router = r
 
 	return s
-
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

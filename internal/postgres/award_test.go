@@ -2,11 +2,12 @@ package postgres_test
 
 import (
 	"context"
-	awards "gosanta/internal"
-	"gosanta/internal/postgres"
 	"os"
 	"testing"
 	"time"
+
+	awards "gosanta/internal"
+	"gosanta/internal/postgres"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/uptrace/bun"

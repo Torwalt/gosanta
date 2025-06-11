@@ -2,8 +2,7 @@ package eventpublishing
 
 import "gosanta/internal"
 
-type EventPublisher struct {
-}
+type EventPublisher struct{}
 
 func New() EventPublisher {
 	return EventPublisher{}

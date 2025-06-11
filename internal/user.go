@@ -2,8 +2,10 @@ package awards
 
 import "fmt"
 
-type UserId int64
-type CompanyId int64
+type (
+	UserId    int64
+	CompanyId int64
+)
 
 // A user that can receive an award.
 type User struct {

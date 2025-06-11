@@ -2,9 +2,10 @@ package awards_test
 
 import (
 	"fmt"
-	awards "gosanta/internal"
 	"testing"
 	"time"
+
+	awards "gosanta/internal"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -146,7 +147,7 @@ func TestNew(t *testing.T) {
 				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
 				ProcessedAt: nil,
 			},
-			WasClicked:    false,
+			WasClicked: false,
 			ExistingAward: &awards.PhishingAward{
 				Id:         int64(1),
 				AssignedTo: awards.UserId(1),
@@ -169,7 +170,7 @@ func TestNew(t *testing.T) {
 				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
 				ProcessedAt: nil,
 			},
-			WasClicked:    false,
+			WasClicked: false,
 			ExistingAward: &awards.PhishingAward{
 				Id:         int64(1),
 				AssignedTo: awards.UserId(1),
@@ -192,7 +193,7 @@ func TestNew(t *testing.T) {
 				EmailRef:    "f20416ef-15d5-4159-9bef-de150edfa970",
 				ProcessedAt: nil,
 			},
-			WasClicked:    false,
+			WasClicked: false,
 			ExistingAward: &awards.PhishingAward{
 				Id:         int64(1),
 				AssignedTo: awards.UserId(1),

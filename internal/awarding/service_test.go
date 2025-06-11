@@ -2,13 +2,14 @@ package awarding_test
 
 import (
 	"fmt"
+	"os"
+	"testing"
+	"time"
+
 	awards "gosanta/internal"
 	"gosanta/internal/awarding"
 	"gosanta/internal/mocks"
 	"gosanta/internal/ports"
-	"os"
-	"testing"
-	"time"
 
 	"github.com/go-kit/log"
 	"github.com/golang/mock/gomock"

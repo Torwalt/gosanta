@@ -1,9 +1,10 @@
 package awards_test
 
 import (
-	awards "gosanta/internal"
 	"testing"
 	"time"
+
+	awards "gosanta/internal"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -132,7 +133,7 @@ func TestLeaderboardDenseRank(t *testing.T) {
 			},
 		},
 		{
-			Name: "1, 1, 1, 1",
+			Name:      "1, 1, 1, 1",
 			ExpRanks:  []int{1, 1, 1, 1},
 			ExpScores: []int{10, 10, 10, 10},
 			Lmembers: []awards.LeaderboardMember{
@@ -183,7 +184,7 @@ func TestLeaderboardDenseRank(t *testing.T) {
 			},
 		},
 		{
-			Name: "1, 2, 2, 2",
+			Name:      "1, 2, 2, 2",
 			ExpRanks:  []int{1, 2, 2, 2},
 			ExpScores: []int{20, 10, 10, 10},
 			Lmembers: []awards.LeaderboardMember{

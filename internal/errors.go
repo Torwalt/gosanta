@@ -33,4 +33,3 @@ func ExtendError(err error, msg string) *Error {
 
 	return &Error{Code: awardErr.Code, Err: fmt.Errorf("%v: %v", msg, err)}
 }
-

@@ -2,6 +2,7 @@ package eventlogging
 
 import (
 	"fmt"
+
 	awards "gosanta/internal"
 	"gosanta/internal/ports"
 )

@@ -20,7 +20,6 @@ func TestGetUserAwards(t *testing.T) {
 	userId := awards.UserId(1)
 	url := "/awards/v1/user/1"
 	req, err := http.NewRequest(http.MethodGet, url, nil)
-
 	if err != nil {
 		t.Errorf("Error creating a new request: %v", err)
 	}
@@ -100,7 +99,6 @@ func TestGetUserAwardsErrors(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			url := "/awards/v1/user/" + test.UserId
 			req, err := http.NewRequest(http.MethodGet, url, nil)
-
 			if err != nil {
 				t.Errorf("Error creating a new request: %v", err)
 			}
@@ -128,7 +126,6 @@ func TestGetUserAwardsErrors(t *testing.T) {
 			assert.Equal(t, test.StatusCode, rr.Code)
 		})
 	}
-
 }
 
 func TestCalcLeaderboard(t *testing.T) {

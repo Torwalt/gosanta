@@ -2,11 +2,12 @@ package rest
 
 import (
 	"encoding/json"
-	awards "gosanta/internal"
-	"gosanta/internal/ports"
 	"net/http"
 	"strconv"
 	"time"
+
+	awards "gosanta/internal"
+	"gosanta/internal/ports"
 
 	"github.com/go-chi/chi"
 )
@@ -65,7 +66,8 @@ func (h *awardsHandler) getUserAwards(w http.ResponseWriter, r *http.Request) {
 	for _, a := range awardS {
 		uar := UserAwardResponse{
 			Id: a.Id, UserId: int(a.AssignedTo), CreatedOn: a.EarnedOn,
-			Type: a.Type.String()}
+			Type: a.Type.String(),
+		}
 		resp = append(resp, uar)
 	}
 	if err := json.NewEncoder(w).Encode(resp); err != nil {

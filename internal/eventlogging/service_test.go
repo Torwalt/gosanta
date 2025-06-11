@@ -1,12 +1,13 @@
 package eventlogging_test
 
 import (
+	"testing"
+	"time"
+
 	awards "gosanta/internal"
 	"gosanta/internal/eventlogging"
 	"gosanta/internal/mocks"
 	events "gosanta/pkg"
-	"testing"
-	"time"
 
 	"github.com/golang/mock/gomock"
 )

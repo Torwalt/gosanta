@@ -1,11 +1,12 @@
 package ranking_test
 
 import (
+	"testing"
+	"time"
+
 	awards "gosanta/internal"
 	"gosanta/internal/mocks"
 	"gosanta/internal/ranking"
-	"testing"
-	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"

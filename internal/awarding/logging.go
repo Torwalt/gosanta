@@ -1,9 +1,10 @@
 package awarding
 
 import (
+	"time"
+
 	awards "gosanta/internal"
 	"gosanta/internal/ports"
-	"time"
 
 	"github.com/go-kit/kit/log"
 )
@@ -28,4 +29,3 @@ func (s *loggingService) AssignAward(event awards.UserPhishingEvent) (usrAwardEv
 	}(time.Now())
 	return s.next.AssignAward(event)
 }
-

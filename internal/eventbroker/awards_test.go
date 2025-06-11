@@ -1,13 +1,14 @@
 package eventbroker_test
 
 import (
-	awards "gosanta/internal"
-	"gosanta/internal/eventbroker"
-	"gosanta/internal/mocks"
 	"os"
 	"sync"
 	"testing"
 	"time"
+
+	awards "gosanta/internal"
+	"gosanta/internal/eventbroker"
+	"gosanta/internal/mocks"
 
 	"github.com/go-kit/log"
 	"github.com/golang/mock/gomock"

@@ -2,9 +2,10 @@ package eventbroker
 
 import (
 	"fmt"
+	"time"
+
 	awards "gosanta/internal"
 	"gosanta/internal/ports"
-	"time"
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"

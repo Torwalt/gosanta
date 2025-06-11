@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+
 	awards "gosanta/internal"
 	"gosanta/internal/awarding"
 	"gosanta/internal/awssqs"
@@ -13,8 +16,6 @@ import (
 	"gosanta/internal/ranking"
 	"gosanta/internal/rest"
 	"gosanta/internal/usernotifying"
-	"net/http"
-	"os"
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
@@ -29,7 +30,6 @@ func main() {
 	logger := log.NewLogfmtLogger(w)
 
 	err := run(logger)
-
 	if err != nil {
 		logger.Log("error", err)
 		os.Exit(1)

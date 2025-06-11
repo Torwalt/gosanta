@@ -2,8 +2,7 @@ package usernotifying
 
 import "gosanta/internal"
 
-type UserNotifyer struct {
-}
+type UserNotifyer struct{}
 
 func New() UserNotifyer {
 	return UserNotifyer{}
