@@ -4,3 +4,4 @@ cover.out
 /bin
 !/bin/.start.sh
 .direnv
+./awarder

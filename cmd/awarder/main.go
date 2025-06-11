@@ -44,8 +44,8 @@ func run(logger log.Logger) error {
 		Host:   config.postgres_host,
 		Port:   config.postgres_port,
 		User:   config.postgres_user,
-		Secret: config.postgres_secret,
-		Name:   config.postgres_name,
+		Secret: config.postgres_password,
+		Name:   config.postgres_db,
 	}
 	sqldb := postgres.NewDb(pconf)
 	ar := postgres.NewAwardRepository(sqldb)
@@ -105,21 +105,21 @@ type config struct {
 
 	queueURL string
 
-	postgres_host   string
-	postgres_port   string
-	postgres_user   string
-	postgres_secret string
-	postgres_name   string
+	postgres_host     string
+	postgres_port     string
+	postgres_user     string
+	postgres_password string
+	postgres_db       string
 }
 
 func loadFromEnv() *config {
 	return &config{
-		http_port:       os.Getenv("HTTP_PORT"),
-		queueURL:        os.Getenv("queueURL"),
-		postgres_host:   os.Getenv("POSTGRES_HOST"),
-		postgres_port:   os.Getenv("POSTGRES_PORT"),
-		postgres_user:   os.Getenv("POSTGRES_USER"),
-		postgres_secret: os.Getenv("POSTGRES_SECRET"),
-		postgres_name:   os.Getenv("POSTGRES_NAME"),
+		http_port:         os.Getenv("HTTP_PORT"),
+		queueURL:          os.Getenv("queueURL"),
+		postgres_host:     os.Getenv("POSTGRES_HOST"),
+		postgres_port:     os.Getenv("POSTGRES_PORT"),
+		postgres_user:     os.Getenv("POSTGRES_USER"),
+		postgres_password: os.Getenv("POSTGRES_PASSWORD"),
+		postgres_db:       os.Getenv("POSTGRES_DB"),
 	}
 }

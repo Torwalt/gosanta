@@ -1,38 +1,16 @@
-version: '3.4'
-
 services:
-
-  gosanta-db:
-    image: postgres:13-alpine
-    container_name: "gosanta-db"
-    volumes:
-      - gosanta-data:/var/lib/postgresql/data/
+  db:
+    image: postgres:14
+    restart: unless-stopped
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_SECRET}
-      - POSTGRES_SECRET=${POSTGRES_SECRET}
-      - POSTGRES_DB=${POSTGRES_NAME}
-      - POSTGRES_NAME=${POSTGRES_NAME}
+      POSTGRES_USER: gosanta
+      POSTGRES_PASSWORD: gosanta
+      POSTGRES_DB: gosanta
     ports:
       - "5432:5432"
-    networks:
-      - gosanta-net
-
-  gosanta-server:
-    container_name: "gosanta-server"
-    depends_on:
-      - gosanta-db
-    ports:
-      - ${HTTP_PORT}:${HTTP_PORT}
-    build:
-      context: .
-      args:
-        - HTTP_PORT=${HTTP_PORT}
-        - BINARY_NAME=gosanta_server
-
-networks:
-  gosanta-net:
-    driver: bridge
+    volumes:
+      - db_data:/var/lib/postgresql/data
 
 volumes:
-  gosanta-data:
+  db_data:
+

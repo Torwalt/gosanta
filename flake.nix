@@ -11,6 +11,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
         buildDeps = with pkgs; [ go ];
-        devDeps = with pkgs; buildDeps ++ [ just gotestsum gofumpt pre-commit golines ];
+        devDeps = with pkgs;
+          buildDeps ++ [ just gotestsum gofumpt pre-commit golines postgresql ];
       in { devShell = pkgs.mkShell { buildInputs = devDeps; }; });
 }
